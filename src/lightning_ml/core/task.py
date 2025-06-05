@@ -39,6 +39,27 @@ class Task(pl.LightningModule, ABC):
     def forward(self, *args: Any, **kwargs: Any) -> Any:
         return self.model(*args, **kwargs)
 
+    def compute_metrics(
+        self, preds: Tensor, targets: Tensor, split: str = "train", log: bool = True
+    ):
+        """Compute and log train/val/test torch metrics
+
+        Args:
+            preds (Tensor): _description_
+            targets (Tensor): _description_
+            split (str, optional): _description_. Defaults to "train".
+            log (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            _type_: _description_
+        """
+        metrics = self.metrics[split](preds, targets)
+        if log:
+            self.log_dict(
+                {f"{split}_{k}": v for k, v in metrics.items()}, prog_bar=True
+            )
+        return metrics
+
     def configure_optimizers(self):
         """
         Configure optimisers and, optionally, LR schedulers for
