@@ -1,3 +1,3 @@
-from .lightning_module import BaseLitModule
+from .task import Task
 
-__all__ = ["BaseLitModule"]
+__all__ = ["Task"]

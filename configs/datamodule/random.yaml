@@ -1,5 +1,0 @@
-name: RandomDataModule
-params:
-  input_dim: 32
-  length: 100
-  batch_size: 8

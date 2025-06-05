@@ -46,7 +46,9 @@
     // Import sorter settings (ms-python.isort)
     // -------------------------------------------------------------------------
     "isort.args": [
-        "--profile", "black" // Make isort + Black agree
+        "--profile", "black",        // keep existing style agreement
+        "--float-to-top",            // pull *all* imports to the top
+        "--remove-redundant-aliases" // drop `import os as os`, etc.
     ],
 
     // -------------------------------------------------------------------------

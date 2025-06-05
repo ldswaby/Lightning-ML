@@ -1,8 +1,0 @@
-defaults:
-  - datamodule: random
-  - model: simple
-  - trainer: default
-  - loss: cross_entropy
-  - _self_
-
-seed: 42
