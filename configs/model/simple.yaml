@@ -1,0 +1,5 @@
+name: MyCustomModel
+params:
+  input_size: 32
+  hidden_size: 64
+  output_size: 2

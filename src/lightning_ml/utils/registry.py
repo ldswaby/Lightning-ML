@@ -57,12 +57,11 @@ class Registry(dict):
         Returns:
             T: The registered class or function.
         """
-        cls = self.get(name)
-        if cls is None:
+        if name not in self:
             raise KeyError(
                 f"{self._lib.capitalize()} '{name}' not found in the registry."
             )
-        return cls
+        return super().__getitem__(name)
 
     def list_keys(self) -> List[str]:
         """Returns a list of all registered keys.
