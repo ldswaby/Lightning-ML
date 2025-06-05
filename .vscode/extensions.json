@@ -1,0 +1,29 @@
+{
+    // ---------------------------------------------------------------------
+    // Recommended extensions for this workspace
+    // ---------------------------------------------------------------------
+    "recommendations": [
+        // --- Core Python toolchain ---
+        "ms-python.python",
+        "ms-python.vscode-pylance",    // type-checker & IntelliSense
+
+        // --- Formatter & import sorter ---
+        "ms-python.black-formatter",   // used by editor.defaultFormatter
+        "ms-python.isort",             // used by source.organizeImports
+
+        // --- Linting ---
+        "ms-python.flake8",
+
+        // --- Docstrings ---
+        "njpwerner.autodocstring",     // Quick docstring snippets
+    ],
+
+    // ---------------------------------------------------------------------
+    // Extensions you explicitly *don’t* want in this repo
+    // (Helps new contributors avoid conflicting tools)
+    // ---------------------------------------------------------------------
+    "unwantedRecommendations": [
+        "ms-python.autopep8",          // We standardise on Black, not autopep8
+        "ms-python.pylint"             // Flake8 takes care of linting for this project
+    ]
+}

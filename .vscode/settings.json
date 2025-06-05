@@ -1,0 +1,79 @@
+{
+    // -------------------------------------------------------------------------
+    // Python-specific editor behaviour
+    // -------------------------------------------------------------------------
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter", // Run Black
+        "editor.formatOnSave": true, // Format every save
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit", // isort will reorder imports
+            "source.fixAll": "explicit" // Let linters offer quick-fixes
+        }
+    },
+
+    // -------------------------------------------------------------------------
+    // Universal editor hygiene
+    // -------------------------------------------------------------------------
+    "editor.tabSize": 4, // PEP 8 indentation
+    "editor.insertSpaces": true,
+    "editor.showUnused": true,  // Shows unused code
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.autoSave": "onWindowChange",
+    "files.exclude": {  // Keep clutter out of the Explorer
+        "**/__pycache__": true,
+        "**/*.pyc": true
+    },
+
+    // -------------------------------------------------------------------------
+    // Pylance static analysis
+    // -------------------------------------------------------------------------
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.useLibraryCodeForTypes": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingDocstring": "information" // Gentle nudge for docs
+    },
+
+    // -------------------------------------------------------------------------
+    // Black formatter settings (ms-python.black-formatter)
+    // -------------------------------------------------------------------------
+    "black-formatter.args": [
+        "--line-length", "88"  // Keep Black’s default width
+    ],  // ...change to 79 if strict PEP 8
+
+    // -------------------------------------------------------------------------
+    // Import sorter settings (ms-python.isort)
+    // -------------------------------------------------------------------------
+    "isort.args": [
+        "--profile", "black" // Make isort + Black agree
+    ],
+
+    // -------------------------------------------------------------------------
+    // Flake8 linter settings (ms-python.flake8)
+    // -------------------------------------------------------------------------
+    "flake8.enabled": true,
+    "flake8.args": [
+        "--max-line-length=88",  // Match Black
+        "--extend-ignore=E203",  // Slice-spacing rule Black breaks
+        "--docstring-convention=google" // Expect Google-style docstrings
+    ],
+
+    // -------------------------------------------------------------------------
+    // Extension settings
+    // -------------------------------------------------------------------------
+    "autoDocstring.docstringFormat": "google",
+
+    // -------------------------------------------------------------------------
+    // Testing
+    // -------------------------------------------------------------------------
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "tests", "-q"
+    ],
+
+    // -------------------------------------------------------------------------
+    // Terminal integration
+    // -------------------------------------------------------------------------
+    "python.terminal.activateEnvironment": true
+}
