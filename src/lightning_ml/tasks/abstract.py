@@ -2,12 +2,12 @@ from typing import Dict
 
 from torch import Tensor
 
-from ..core import Task
+from ..core import Problem
 
 __all__ = ["Supervised", "Unsupervised"]
 
 
-class Supervised(Task):
+class Supervised(Problem):
     """
     Supervised learning base task.
 
@@ -25,8 +25,8 @@ class Supervised(Task):
         Returns:
             Dict[str, Tensor]: _description_
         """
-        x, y = batch
-        logits = self(x)
+        _, y = batch
+        logits = self.predict_step(batch)
         loss = self.criterion(logits, y)
         return {
             "loss": loss,
@@ -35,7 +35,7 @@ class Supervised(Task):
         }
 
 
-class Unsupervised(Task):
+class Unsupervised(Problem):
     """
     Unsupervised learning base task.
 
@@ -45,6 +45,6 @@ class Unsupervised(Task):
     """
 
     def step(self, batch) -> Dict[str, Tensor]:
-        logits = self(batch)
+        logits = self.predict_step(batch)
         loss = self.criterion(logits)
         return {"loss": loss}
