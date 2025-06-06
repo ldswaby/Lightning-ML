@@ -1,7 +1,15 @@
+"""
+Task abstraction for training, validation, and testing of PyTorch Lightning models.
+
+This module defines the Task base class that encapsulates the core components
+of a machine learning pipeline, including data modules, models, loss functions,
+optimizers, metrics, and schedulers.
+"""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any, Callable, Dict, Optional
 
 import pytorch_lightning as pl
 from torch import Tensor, nn
@@ -12,61 +20,100 @@ from torchmetrics import MetricCollection
 
 class Task(pl.LightningModule, ABC):
     """
-    Build all the ML project components
-    TODO: have this have a fixed __init__ that builds all componnets from
-    cfg (or have them built elsewhere then passed into Task as clasmethod?)
-
-    NOTE: we need child classes to at least have training_step
+    Paradigm-agnostic Lightning template.
+    Subclasses must implement `step` to compute a dict that at minimum
+    contains a `'loss'` Tensor. Anything else is optional.
     """
 
     def __init__(
         self,
-        data: pl.LightningDataModule,
         model: nn.Module,
-        criterion: nn.Module,
         optimizer: Optimizer,
+        data: Optional[pl.LightningDataModule] = None,
+        criterion: Optional[Callable | nn.Module] = None,
         metrics: Optional[dict[str, MetricCollection]] = None,
         scheduler: Optional[_LRScheduler] = None,
     ) -> None:
+        """
+        Initializes the Task with data, model, loss, optimizer, metrics, and scheduler.
+
+        Args:
+            data (pl.LightningDataModule): Data module for providing data loaders.
+            model (nn.Module): Neural network model to be trained.
+            criterion (nn.Module): Loss function used during training.
+            optimizer (Optimizer): Optimizer class or a callable that returns an optimizer instance when given parameters.
+            metrics (dict[str, MetricCollection], optional): Dictionary mapping stage names ('train', 'val', 'test') to MetricCollection instances. Defaults to None.
+            scheduler (_LRScheduler, optional): Learning rate scheduler instance. Defaults to None.
+        """
         super().__init__()
-        self.data = data
+        # self.save_hyperparameters(ignore=["model", "data", "criterion", "metrics"])
         self.model = model
-        self.criterion = criterion
+        self.data = data
+        self.criterion = criterion  # may be None for e.g. GANs, BYOL, …
         self.metrics = metrics or {}
-        self.optimizer = optimizer
+        self.optimizer_ctor = optimizer  # ctor or partial
         self.scheduler = scheduler
+
+    @abstractmethod
+    def step(self, batch: Any) -> Dict[str, Any]:
+        """
+        Must return at least {'loss': Tensor}. Can also return
+        'preds', 'targets', additional tensors or scalars for logging.
+        """
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
         return self.model(*args, **kwargs)
 
-    def compute_metrics(
-        self, preds: Tensor, targets: Tensor, split: str = "train", log: bool = True
-    ):
-        """Compute and log train/val/test torch metrics
+    # shared wrapper used by train/val/test hooks
+    def _shared_step(self, batch: Any, stage: str) -> Tensor:
+        """Logic shared by train, test, and validation steps.
 
         Args:
-            preds (Tensor): _description_
-            targets (Tensor): _description_
-            split (str, optional): _description_. Defaults to "train".
-            log (bool, optional): _description_. Defaults to True.
+            batch (Any): _description_
+            stage (str): _description_
 
         Returns:
-            _type_: _description_
+            Tensor: _description_
         """
-        metrics = self.metrics[split](preds, targets)
-        if log:
-            self.log_dict(
-                {f"{split}_{k}": v for k, v in metrics.items()}, prog_bar=True
-            )
-        return metrics
+        out = self.step(batch)  # user-defined
+        self.log(
+            f"{stage}_loss",
+            out["loss"],
+            prog_bar=True,
+            on_step=False,
+            on_epoch=True,
+            batch_size=len(batch),
+        )
 
-    def configure_optimizers(self):
+        # Optional metrics
+        if stage in self.metrics:
+            preds = out.get("preds")
+            targets = out.get("targets")
+            if preds is not None and targets is not None:
+                metric_vals = self.metrics[stage](preds, targets)
+                self.log_dict(
+                    {f"{stage}_{k}": v for k, v in metric_vals.items()},
+                    prog_bar=True,
+                    on_epoch=True,
+                    batch_size=len(batch),
+                )
+        return out["loss"]
+
+    def training_step(self, batch, batch_idx) -> Tensor:
+        """Training step logic
+
+        Returns:
+            Tensor: loss
         """
-        Configure optimisers and, optionally, LR schedulers for
-        PyTorch-Lightning.
-        """
-        # TODO: what about scheduler?
-        return self.optimizer
+        return self._shared_step(batch, "train")
+
+    def validation_step(self, batch, batch_idx) -> None:
+        """Validation step logic"""
+        self._shared_step(batch, "val")
+
+    def test_step(self, batch, batch_idx) -> None:
+        """Test step logic"""
+        self._shared_step(batch, "test")
 
     def on_train_epoch_start(self) -> None:
         """Resets train metrics per epoch"""
@@ -83,6 +130,12 @@ class Task(pl.LightningModule, ABC):
         if "test" in self.metrics:
             self.metrics["test"].reset()
 
-    @abstractmethod
-    def training_step(self, batch, batch_idx: int) -> Tensor:
-        """Task-specific training logic. Must return loss tensor"""
+    def configure_optimizers(self) -> Optimizer:
+        """
+        Configure optimisers and, optionally, LR schedulers for
+        PyTorch-Lightning.
+        """
+        # TODO: what about scheduler?
+        return self.optimizer
+
+    ##########
