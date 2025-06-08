@@ -125,8 +125,8 @@ class Learner(pl.LightningModule, ABC):
 
         # Optional metrics
         if stage in self.metrics:
-            outputs = out.get("outputs")
-            targets = out.get("targets")
+            outputs = out.get("output")
+            targets = out.get("target")
             if outputs is not None and targets is not None:
                 metric_vals = self.metrics[stage](outputs, targets)
                 self.log_dict(

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Any, Dict, Tuple
 
 from torch import Tensor
 
@@ -12,20 +12,23 @@ __all__ = ["ContrastiveSupervised", "ContrastiveUnsupervised"]
 class ContrastiveSupervised(Supervised):
     """Supervised contrastive learning task.
 
-    Expects batches to contain two augmented views of each input and
-    corresponding targets. The criterion should accept ``(z1, z2, target)``
-    and return a scalar loss tensor.
+    Expects batches to contain two augmented views of each input along with
+    targets. The criterion should accept ``(z1, z2, target)`` and return a
+    scalar loss tensor.
     """
 
-    def step(self, batch: Dict[str, Tensor]) -> Dict[str, Tensor]:
-        out: Dict[str, Tensor] = {}
-        z1 = self(batch["view1"])
-        z2 = self(batch["view2"])
-        target = batch["target"]
-        out["output"] = (z1, z2)
-        out["target"] = target
-        out["loss"] = self.criterion(z1, z2, target)
-        return out
+    def get_inputs(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
+        return batch["view1"], batch["view2"]
+
+    def forward_batch(self, inputs: Tuple[Tensor, Tensor]) -> Tuple[Tensor, Tensor]:
+        v1, v2 = inputs
+        z1 = self(v1)
+        z2 = self(v2)
+        return z1, z2
+
+    def compute_loss(self, outputs: Tuple[Tensor, Tensor], targets: Tensor) -> Tensor:
+        z1, z2 = outputs
+        return self.criterion(z1, z2, targets)
 
 
 class ContrastiveUnsupervised(Unsupervised):
@@ -35,10 +38,15 @@ class ContrastiveUnsupervised(Unsupervised):
     criterion should accept ``(z1, z2)`` and return a scalar loss tensor.
     """
 
-    def step(self, batch: Dict[str, Tensor]) -> Dict[str, Tensor]:
-        out: Dict[str, Tensor] = {}
-        z1 = self(batch["view1"])
-        z2 = self(batch["view2"])
-        out["output"] = (z1, z2)
-        out["loss"] = self.criterion(z1, z2)
-        return out
+    def get_inputs(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
+        return batch["view1"], batch["view2"]
+
+    def forward_batch(self, inputs: Tuple[Tensor, Tensor]) -> Tuple[Tensor, Tensor]:
+        v1, v2 = inputs
+        z1 = self(v1)
+        z2 = self(v2)
+        return z1, z2
+
+    def compute_loss(self, outputs: Tuple[Tensor, Tensor]) -> Tensor:
+        z1, z2 = outputs
+        return self.criterion(z1, z2)
