@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type
 
 from pytorch_lightning import LightningDataModule, Trainer
 
@@ -10,21 +10,16 @@ from .predictor import PredictorMixin
 class Project:
     def __init__(
         self,
-        learner: Learner,
-        predictor: Optional[PredictorMixin] = None,
+        learner: Type[Learner],
+        *,
+        predictor: Optional[Type[PredictorMixin]] = None,
         trainer: Optional[Trainer] = None,
-    ):
-        """Can pass in Trainer or None
+        **learner_kwargs,
+    ) -> None:
+        """Combine a learner, optional predictor, and trainer into a project."""
 
-        TODO: if predictor is None then make student = Learner
-
-        Args:
-            learner (Learner): _description_
-            predictor (PredictorMixin): _description_
-            trainer (Optional[Trainer], optional): _description_. Defaults to None.
-        """
-        student_cls = bind_classes(learner, predictor)
-        self.student
+        Student = bind_classes(learner, predictor) if predictor else learner
+        self.student = Student(**learner_kwargs)
         self.trainer = trainer or Trainer()
 
     @property

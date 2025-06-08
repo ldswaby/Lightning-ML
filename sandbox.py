@@ -1,9 +1,8 @@
 from pytorch_lightning import Trainer
 
-from src.lightning_ml.core import Learner, PredictorMixin
+from src.lightning_ml.core import Project
 from src.lightning_ml.learners import Supervised
 from src.lightning_ml.predictors import Classification
-from src.lightning_ml.utils import bind_classes
 
 # #############
 # model = NotImplemented
@@ -14,17 +13,10 @@ from src.lightning_ml.utils import bind_classes
 # scheduler = NotImplemented
 # #############
 
-student = Supervised.with_predictor(
-    Classification,
-    model=model,
-    optimizer=optimizer,
-    data=data,
-    criterion=crtierion,
-    metrics=metrics,
-    scheduler=None,
-)
-
-student = bind_classes(Supervised, Classification)(
+# Create a Learner and optionally combine it with a Predictor using ``Project``.
+project = Project(
+    Supervised,
+    predictor=Classification,
     model=model,
     optimizer=optimizer,
     data=data,
@@ -33,8 +25,5 @@ student = bind_classes(Supervised, Classification)(
     scheduler=None,  # TODO
 )
 
-# QUESTION: I don't like either of the above.
-# Why can't I define:
-# 1. Learner (with optionally combined PredictorMixin to make a 'student' - learner + optinal predictor)
-# 3. Trainer (pytorch_lighting.Trainer)
-# 4. Project object which combines all the above
+# The ``Project`` instance exposes Trainer-like methods for convenience
+# and can be used as the single entry point for training or inference.
