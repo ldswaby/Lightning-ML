@@ -96,7 +96,7 @@ class Learner(pl.LightningModule, ABC):
         Must use self.predict_step if it is is to be compatible with Task wrappers
 
         Must return at least {'loss': Tensor}. Can also return
-        'outputs', 'targets', additional tensors or scalars for logging.
+        'output', 'target', additional tensors or scalars for logging.
         """
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:

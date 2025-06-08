@@ -25,4 +25,8 @@ class Predictor:
 
     @abstractmethod
     def __call__(self, outputs: Dict[str, Tensor]) -> Any:
-        """Convert Learner.predict_step outputs into task-specific predictions."""
+        """Convert Learner.step outputs into task-specific predictions.
+
+        NOTE: outputs will always contain at least {'loss': Tensor}. Can also
+        contain 'output', 'target', additional tensors or scalars for logging.
+        """
