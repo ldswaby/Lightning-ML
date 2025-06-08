@@ -97,7 +97,6 @@ student = bind_classes(Supervised, Classification)(
     scheduler=None,  # TODO
 )
 
-
 project = Project(student=student, trainer=Trainer())
 
 project.train()
