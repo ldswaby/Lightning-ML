@@ -1,12 +1,14 @@
+from typing import Any, Dict
+
 from torch import Tensor
 
-from ..core import PredictorMixin
+from ..core import Predictor
 
 __all__ = ["Classification"]
 
 
-class Classification(PredictorMixin):
+class Classification(Predictor):
     """Classification predictor"""
 
-    def post_process(self, logits: Tensor) -> Tensor:
-        return logits.softmax(dim=-1).argmax(dim=-1)
+    def __call__(self, outputs: Dict[str, Any]) -> Tensor:
+        return outputs["output"].softmax(dim=-1).argmax(dim=-1)

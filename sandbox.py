@@ -38,11 +38,14 @@ class DummyDataModule(pl.LightningDataModule):
     def __init__(self, batch_size: int = 16):
         super().__init__()
         self.batch_size = batch_size
+        # lazily created in `setup`; helps us detect if `setup()` has run
+        self.predict_set = None
 
     def setup(self, stage: str | None = None):
         self.train_set = DummyClassificationDataset(120)
         self.val_set = DummyClassificationDataset(40)
         self.test_set = DummyClassificationDataset(40)
+        self.predict_set = DummyClassificationDataset(40)
 
     def train_dataloader(self):
         return DataLoader(self.train_set, batch_size=self.batch_size)
@@ -52,6 +55,18 @@ class DummyDataModule(pl.LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(self.test_set, batch_size=self.batch_size)
+
+    def predict_dataloader(self):
+        """DataLoader for inference/prediction.
+
+        Ensures ``setup('predict')`` has run so that *predict_set*
+        exists.  This lets external code call ``trainer.predict`` /
+        ``project.predict`` without having to remember to run
+        ``dm.setup(...)`` first.
+        """
+        if self.predict_set is None:  # setup() not yet called
+            self.setup(stage="predict")
+        return DataLoader(self.predict_set, batch_size=self.batch_size)
 
 
 # simple classifier: flatten → linear
@@ -87,22 +102,29 @@ optimizer: Optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 scheduler = None
 # #############  end dummy setup #############
 
-
-student = bind_classes(Supervised, Classification)(
+learner = Supervised(
     model=model,
     optimizer=optimizer,
     data=data,
     criterion=criterion,
     metrics=metrics,
-    scheduler=None,  # TODO
+    scheduler=None,
 )
 
-project = Project(student=student, trainer=Trainer())
+learner.predictor = Classification()
 
-project.train()
 
-# QUESTION: I don't like either of the above.
-# Why can't I define:
-# 1. Learner (with optionally combined PredictorMixin to make a 'student' - learner + optinal predictor)
-# 3. Trainer (pytorch_lighting.Trainer)
-# 4. Project object which combines all the above
+# student = bind_classes(Supervised, Classification)(
+#     model=model,
+#     optimizer=optimizer,
+#     data=data,
+#     criterion=criterion,
+#     metrics=metrics,
+#     scheduler=None,  # TODO
+# )
+
+project = Project(learner=learner, trainer=Trainer())
+
+out = project.predict()
+# project.train()
+breakpoint()

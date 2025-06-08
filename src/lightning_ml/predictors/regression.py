@@ -1,10 +1,14 @@
-from ..core import PredictorMixin
+from typing import Any, Dict
+
+from torch import Tensor
+
+from ..core import Predictor
 
 __all__ = ["Regression"]
 
 
-class Regression(PredictorMixin):
+class Regression(Predictor):
     """Basic regression predictor"""
 
-    def post_process(self, preds):
-        return preds.squeeze(-1)
+    def __call__(self, outputs: Dict[str, Any]) -> Tensor:
+        return outputs["output"].squeeze(-1)

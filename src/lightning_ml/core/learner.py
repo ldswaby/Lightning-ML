@@ -24,7 +24,7 @@ from torch.optim.optimizer import Optimizer
 from torchmetrics import MetricCollection
 
 from ..utils import bind_classes
-from .predictor import PredictorMixin
+from .predictor import Predictor
 
 
 class Learner(pl.LightningModule, ABC):
@@ -42,6 +42,7 @@ class Learner(pl.LightningModule, ABC):
         criterion: Optional[Callable | nn.Module] = None,
         metrics: Optional[dict[str, MetricCollection]] = None,
         scheduler: Optional[_LRScheduler] = None,
+        predictor: Optional[Predictor] = None,
     ) -> None:
         """
         Initializes the Task with data, model, loss, optimizer, metrics, and scheduler.
@@ -60,8 +61,34 @@ class Learner(pl.LightningModule, ABC):
         self.data = data
         self.criterion = criterion  # may be None for e.g. GANs, BYOL, …
         self.metrics = metrics or {}
-        self.optimizer = optimizer  # ctor or partial
+        self.optimizer = optimizer
         self.scheduler = scheduler
+        self.predictor = predictor  # fallback to identity fn
+
+    @property
+    def predictor(self) -> Callable:
+        """Callable that post-processes the output of :meth:`predict_step`.
+
+        You can re-assign it after instantiation:
+
+        ```python
+        learner.predictor = my_custom_predictor
+        ```
+        """
+        return self._predictor
+
+    @predictor.setter
+    def predictor(self, fn: Callable | None) -> None:
+        """Validate and (re)assign the predictor.
+
+        If *fn* is ``None`` we fall back to an identity function so
+        :pymeth:`predict_step` continues to work.
+        """
+        if fn is None:
+            fn = lambda x: x  # identity
+        if not callable(fn):
+            raise TypeError("predictor must be callable")
+        self._predictor = fn
 
     @abstractmethod
     def step(self, batch: Any) -> Dict[str, Any]:
@@ -148,6 +175,20 @@ class Learner(pl.LightningModule, ABC):
         """
         # TODO: what about scheduler?
         return self.optimizer
+
+    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+        """Predict step to override Problem.predict_step via MRO
+
+        Args:
+            batch (_type_): _description_
+            batch_idx (_type_): _description_
+            dataloader_idx (int, optional): _description_. Defaults to 0.
+
+        Returns:
+            _type_: _description_
+        """
+        out = self.step(batch)  # user defined
+        return self.predictor(out)
 
     # @classmethod
     # def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):

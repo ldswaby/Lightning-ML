@@ -15,25 +15,14 @@ Task can wrap it with specialized prediction logic in predict_step
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import Any, Dict
+
+from torch import Tensor
 
 
-class PredictorMixin:
+class Predictor:
     """Mixin that adds a Lightning-compatible predict_step."""
 
     @abstractmethod
-    def post_process(self, outputs):
+    def __call__(self, outputs: Dict[str, Tensor]) -> Any:
         """Convert Learner.predict_step outputs into task-specific predictions."""
-
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
-        """Predict step to override Problem.predict_step via MRO
-
-        Args:
-            batch (_type_): _description_
-            batch_idx (_type_): _description_
-            dataloader_idx (int, optional): _description_. Defaults to 0.
-
-        Returns:
-            _type_: _description_
-        """
-        output = super().predict_step(batch, batch_idx, dataloader_idx)
-        return self.post_process(output)

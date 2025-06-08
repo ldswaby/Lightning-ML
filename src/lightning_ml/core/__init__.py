@@ -1,5 +1,5 @@
 from .learner import Learner
-from .predictor import PredictorMixin
+from .predictor import Predictor
 from .project import Project
 
-__all__ = ["Learner", "PredictorMixin", "Project"]
+__all__ = ["Learner", "Predictor", "Project"]
