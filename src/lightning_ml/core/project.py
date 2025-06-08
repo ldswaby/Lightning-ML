@@ -3,7 +3,8 @@ from typing import Optional
 from pytorch_lightning import LightningDataModule, Trainer
 
 from ..utils import bind_classes
-from . import Learner, PredictorMixin
+from .learner import Learner
+from .predictor import PredictorMixin
 
 
 class Project:

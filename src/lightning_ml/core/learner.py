@@ -24,7 +24,7 @@ from torch.optim.optimizer import Optimizer
 from torchmetrics import MetricCollection
 
 from ..utils import bind_classes
-from . import PredictorMixin
+from .predictor import PredictorMixin
 
 
 class Learner(pl.LightningModule, ABC):
