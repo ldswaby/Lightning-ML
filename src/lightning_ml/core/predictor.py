@@ -92,4 +92,11 @@ class PredictorMixin(pl.LightningModule, ABC):
         return self.post_process(out)
 
     def __getattr__(self, name):  # delegate attrs / hooks
-        return getattr(self._learner, name)
+        """Delegate missing attributes to the wrapped learner."""
+        modules = object.__getattribute__(self, "_modules")
+        if name == "_learner":
+            return modules[name]
+        learner = modules.get("_learner")
+        if learner is None:
+            raise AttributeError(name)
+        return getattr(learner, name)
