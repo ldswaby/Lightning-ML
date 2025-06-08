@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 from torch import Tensor
 
@@ -8,30 +8,19 @@ __all__ = ["Supervised", "Unsupervised"]
 
 
 class Supervised(Learner):
-    """
-    Supervised learning base task.
+    """Base class for supervised learning tasks."""
 
-    Assumes that:
-    * Batches can be decomposed into (inputs, targets)
-    * Parsed loss fn works directly on model outputs with no prior processing
-    """
+    def parse_batch(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
+        return batch["input"], batch["target"]
+
+    def compute_loss(self, outputs: Tensor, target: Tensor) -> Tensor:
+        return self.criterion(outputs, target)
 
     def step(self, batch: Dict[str, Tensor]) -> Dict[str, Tensor]:
-        """
-        TODO: Note that assumed data batches always output dicts with at least
-        keys ['inputs', 'targets']. this can eb for a Supervised Dataset object
-
-        Args:
-            batch (_type_): _description_
-
-        Returns:
-            Dict[str, Tensor]: _description_
-        """
-        out = {}
-        out["target"] = batch["target"]
-        out["output"] = self(batch["input"])
-        out["loss"] = self.criterion(out["output"], batch["target"])
-        return out
+        inputs, target = self.parse_batch(batch)
+        outputs = self(inputs)
+        loss = self.compute_loss(outputs, target)
+        return {"output": outputs, "target": target, "loss": loss}
 
 
 class Unsupervised(Learner):
@@ -43,8 +32,14 @@ class Unsupervised(Learner):
     * Parsed loss fn works directly on model outputs with no prior processing
     """
 
+    def parse_batch(self, batch: Dict[str, Tensor]) -> Tensor:
+        return batch["input"]
+
+    def compute_loss(self, outputs: Tensor) -> Tensor:
+        return self.criterion(outputs)
+
     def step(self, batch) -> Dict[str, Tensor]:
-        out = {}
-        out["output"] = self(batch["input"])
-        out["loss"] = self.criterion(out["output"])
-        return out
+        inputs = self.parse_batch(batch)
+        outputs = self(inputs)
+        loss = self.compute_loss(outputs)
+        return {"output": outputs, "loss": loss}

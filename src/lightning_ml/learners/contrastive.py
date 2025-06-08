@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Tuple
 
 from torch import Tensor
 
@@ -17,15 +17,19 @@ class ContrastiveSupervised(Supervised):
     and return a scalar loss tensor.
     """
 
+    def parse_batch(self, batch: Dict[str, Tensor]) -> Tuple[Tuple[Tensor, Tensor], Tensor]:
+        return (batch["view1"], batch["view2"]), batch["target"]
+
+    def compute_loss(self, outputs: Tuple[Tensor, Tensor], target: Tensor) -> Tensor:
+        z1, z2 = outputs
+        return self.criterion(z1, z2, target)
+
     def step(self, batch: Dict[str, Tensor]) -> Dict[str, Tensor]:
-        out: Dict[str, Tensor] = {}
-        z1 = self(batch["view1"])
-        z2 = self(batch["view2"])
-        target = batch["target"]
-        out["output"] = (z1, z2)
-        out["target"] = target
-        out["loss"] = self.criterion(z1, z2, target)
-        return out
+        (view1, view2), target = self.parse_batch(batch)
+        z1 = self(view1)
+        z2 = self(view2)
+        loss = self.compute_loss((z1, z2), target)
+        return {"output": (z1, z2), "target": target, "loss": loss}
 
 
 class ContrastiveUnsupervised(Unsupervised):
@@ -35,10 +39,16 @@ class ContrastiveUnsupervised(Unsupervised):
     criterion should accept ``(z1, z2)`` and return a scalar loss tensor.
     """
 
+    def parse_batch(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
+        return batch["view1"], batch["view2"]
+
+    def compute_loss(self, outputs: Tuple[Tensor, Tensor]) -> Tensor:
+        z1, z2 = outputs
+        return self.criterion(z1, z2)
+
     def step(self, batch: Dict[str, Tensor]) -> Dict[str, Tensor]:
-        out: Dict[str, Tensor] = {}
-        z1 = self(batch["view1"])
-        z2 = self(batch["view2"])
-        out["output"] = (z1, z2)
-        out["loss"] = self.criterion(z1, z2)
-        return out
+        view1, view2 = self.parse_batch(batch)
+        z1 = self(view1)
+        z2 = self(view2)
+        loss = self.compute_loss((z1, z2))
+        return {"output": (z1, z2), "loss": loss}

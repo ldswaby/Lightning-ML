@@ -91,6 +91,14 @@ class Learner(pl.LightningModule, ABC):
         self._predictor = fn
 
     @abstractmethod
+    def parse_batch(self, batch: Any):
+        """Parse a raw batch into model inputs and optional targets."""
+
+    @abstractmethod
+    def compute_loss(self, outputs: Any, target: Any | None = None) -> Tensor:
+        """Compute the training loss from model outputs and targets."""
+
+    @abstractmethod
     def step(self, batch: Any) -> Dict[str, Any]:
         """
         Must use self.predict_step if it is is to be compatible with Task wrappers
