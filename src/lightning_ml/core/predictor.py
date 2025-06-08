@@ -82,6 +82,29 @@ class PredictorMixin(pl.LightningModule, ABC):
         super().__init__()
         self._learner = learner
 
+    # ------------------------------------------------------------------
+    # Delegate all training, validation and test hooks to the wrapped
+    # learner so that the resulting ``PredictorMixin`` can be passed
+    # directly to a ``pytorch_lightning.Trainer``.  Without these
+    # methods Lightning's configuration validator would complain that
+    # the module has no ``training_step`` defined.
+    # ------------------------------------------------------------------
+
+    def forward(self, *args: Any, **kwargs: Any) -> Any:  # pragma: no cover - thin delegate
+        return self._learner(*args, **kwargs)
+
+    def training_step(self, *args: Any, **kwargs: Any):
+        return self._learner.training_step(*args, **kwargs)
+
+    def validation_step(self, *args: Any, **kwargs: Any):
+        return self._learner.validation_step(*args, **kwargs)
+
+    def test_step(self, *args: Any, **kwargs: Any):
+        return self._learner.test_step(*args, **kwargs)
+
+    def configure_optimizers(self):  # pragma: no cover - simple delegate
+        return self._learner.configure_optimizers()
+
     @abstractmethod
     def post_process(self, outputs: Any) -> Any:
         """Convert raw learner outputs into final predictions."""
