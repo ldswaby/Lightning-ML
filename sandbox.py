@@ -87,7 +87,7 @@ optimizer: Optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 scheduler = None
 # #############  end dummy setup #############
 
-predictor = Classification(
+student = Classification(
     Supervised(
         model=model,
         optimizer=optimizer,
@@ -97,7 +97,7 @@ predictor = Classification(
         scheduler=None,  # TODO
     )
 )
-breakpoint()
+# breakpoint()
 
 # Supervised.add_predictor(predictor=predictor)
 
@@ -112,9 +112,9 @@ breakpoint()
 #     scheduler=None,  # TODO
 # )
 
-# project = Project(student=student, trainer=Trainer())
+project = Project(student=student, trainer=Trainer())
 
-# project.train()
+project.train()
 
 # # QUESTION: I don't like either of the above.
 # # Why can't I define:
