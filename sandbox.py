@@ -87,22 +87,37 @@ optimizer: Optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 scheduler = None
 # #############  end dummy setup #############
 
-
-student = bind_classes(Supervised, Classification)(
-    model=model,
-    optimizer=optimizer,
-    data=data,
-    criterion=criterion,
-    metrics=metrics,
-    scheduler=None,  # TODO
+predictor = Classification(
+    Supervised(
+        model=model,
+        optimizer=optimizer,
+        data=data,
+        criterion=criterion,
+        metrics=metrics,
+        scheduler=None,  # TODO
+    )
 )
+breakpoint()
 
-project = Project(student=student, trainer=Trainer())
+# Supervised.add_predictor(predictor=predictor)
 
-project.train()
+# breakpoint()
 
-# QUESTION: I don't like either of the above.
-# Why can't I define:
-# 1. Learner (with optionally combined PredictorMixin to make a 'student' - learner + optinal predictor)
-# 3. Trainer (pytorch_lighting.Trainer)
-# 4. Project object which combines all the above
+# student = bind_classes(Supervised, Classification)(
+#     model=model,
+#     optimizer=optimizer,
+#     data=data,
+#     criterion=criterion,
+#     metrics=metrics,
+#     scheduler=None,  # TODO
+# )
+
+# project = Project(student=student, trainer=Trainer())
+
+# project.train()
+
+# # QUESTION: I don't like either of the above.
+# # Why can't I define:
+# # 1. Learner (with optionally combined PredictorMixin to make a 'student' - learner + optinal predictor)
+# # 3. Trainer (pytorch_lighting.Trainer)
+# # 4. Project object which combines all the above

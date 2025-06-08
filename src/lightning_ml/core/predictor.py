@@ -1,39 +1,93 @@
-"""
-Task abstraction for training, validation, and testing of PyTorch Lightning models.
-
-This module defines the Task base class that encapsulates the core components
-of a machine learning pipeline, including data modules, models, loss functions,
-optimizers, metrics, and schedulers.
-
-
-# TODO automcaticalay runs self[batch]
-
-Problem can be class below
-Task can wrap it with specialized prediction logic in predict_step
-"""
+"""Predictor utilities and wrappers."""
 
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
+from typing import Any
+
+import pytorch_lightning as pl
+
+from .learner import Learner
+
+__all__ = ["Predictor", "PredictorWrapper"]
 
 
-class PredictorMixin:
-    """Mixin that adds a Lightning-compatible predict_step."""
+# class Predictor(ABC):
+#     """Base class for prediction helpers."""
+
+#     @abstractmethod
+#     def post_process(self, outputs: Any) -> Any:
+#         """Convert raw learner outputs into final predictions."""
+
+#     def predict_step(
+#         self,
+#         learner: Learner,
+#         batch: Any,
+#         batch_idx: int,
+#         dataloader_idx: int = 0,
+#     ) -> Any:
+#         """Default prediction logic that delegates to the learner."""
+#         out = learner.predict_step(batch, batch_idx, dataloader_idx)
+#         return self.post_process(out)
+
+
+# class PredictorWrapper(pl.LightningModule):
+#     """Wraps a learner with a predictor to override ``predict_step``."""
+
+#     def __init__(self, learner: Learner, predictor: Predictor) -> None:
+#         super().__init__()
+#         self.learner = learner
+#         self.predictor = predictor
+
+#     # Delegate attribute access to the learner
+#     def __getattr__(self, item: str):
+#         if item in {"learner", "predictor"}:
+#             return super().__getattribute__(item)
+#         return getattr(self.learner, item)
+
+#     def forward(self, *args: Any, **kwargs: Any) -> Any:  # noqa: D401
+#         """Delegate ``forward`` to the wrapped learner."""
+#         return self.learner(*args, **kwargs)
+
+#     def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+#         return self.predictor.predict_step(
+#             self.learner, batch, batch_idx, dataloader_idx
+#         )
+
+
+# class Predictor(ABC):
+#     """Base class for prediction helpers."""
+
+#     @abstractmethod
+#     def post_process(self, outputs: Any) -> Any:
+#         """Convert raw learner outputs into final predictions."""
+
+#     def predict_step(
+#         self,
+#         learner: Learner,
+#         batch: Any,
+#         batch_idx: int,
+#         dataloader_idx: int = 0,
+#     ) -> Any:
+#         """Default prediction logic that delegates to the learner."""
+#         out = learner.predict_step(batch, batch_idx, dataloader_idx)
+#         return self.post_process(out)
+
+
+class Predictor(ABC):
+    """Wraps a learner with a predictor to override ``predict_step``."""
+
+    def __init__(self, learner: Learner) -> None:
+        self._learner = learner
 
     @abstractmethod
-    def post_process(self, outputs):
-        """Convert Learner.predict_step outputs into task-specific predictions."""
+    def post_process(self, outputs: Any) -> Any:
+        """Convert raw learner outputs into final predictions."""
 
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
-        """Predict step to override Problem.predict_step via MRO
+    def predict_step(self, *args, **kwargs) -> Any:
+        """Default prediction logic that delegates to the learner."""
+        out = self._learner.predict_step(*args, **kwargs)
+        return self.post_process(out)
 
-        Args:
-            batch (_type_): _description_
-            batch_idx (_type_): _description_
-            dataloader_idx (int, optional): _description_. Defaults to 0.
-
-        Returns:
-            _type_: _description_
-        """
-        output = super().predict_step(batch, batch_idx, dataloader_idx)
-        return self.post_process(output)
+    def __getattr__(self, name):  # delegate attrs / hooks
+        return getattr(self._learner, name)

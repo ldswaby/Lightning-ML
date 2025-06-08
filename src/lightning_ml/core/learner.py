@@ -15,6 +15,7 @@ Task can wrap it with specialized prediction logic in predict_step
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from types import MethodType
 from typing import Any, Callable, Dict, Optional, Type
 
 import pytorch_lightning as pl
@@ -148,3 +149,18 @@ class Learner(pl.LightningModule, ABC):
         """
         # TODO: what about scheduler?
         return self.optimizer
+
+    # def add_predictor(self, predictor: PredictorMixin):
+    #     """Attach a PredictorMixin and wrap the current predict_step."""
+    #     self._predictor = predictor
+
+    #     # grab whatever predict_step the class (or subclass) currently has
+    #     orig_predict = self.predict_step
+
+    #     # define a thin wrapper that calls the original then post-processes
+    #     def wrapped_predict(self, batch, batch_idx, dataloader_idx=0):
+    #         raw_out = orig_predict(batch, batch_idx, dataloader_idx)
+    #         return self._predictor.post_process(raw_out)
+
+    #     # bind that wrapper onto this instance
+    #     self.predict_step = MethodType(wrapped_predict, self)
