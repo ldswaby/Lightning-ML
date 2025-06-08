@@ -10,8 +10,7 @@ from .predictor import PredictorMixin
 class Project:
     def __init__(
         self,
-        learner: Learner,
-        predictor: Optional[PredictorMixin] = None,
+        student: Learner,
         trainer: Optional[Trainer] = None,
     ):
         """Can pass in Trainer or None
@@ -23,8 +22,7 @@ class Project:
             predictor (PredictorMixin): _description_
             trainer (Optional[Trainer], optional): _description_. Defaults to None.
         """
-        student_cls = bind_classes(learner, predictor)
-        self.student
+        self.student = student
         self.trainer = trainer or Trainer()
 
     @property

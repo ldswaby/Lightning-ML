@@ -60,7 +60,7 @@ class Learner(pl.LightningModule, ABC):
         self.data = data
         self.criterion = criterion  # may be None for e.g. GANs, BYOL, …
         self.metrics = metrics or {}
-        self.optimizer_ctor = optimizer  # ctor or partial
+        self.optimizer = optimizer  # ctor or partial
         self.scheduler = scheduler
 
     @abstractmethod
@@ -149,10 +149,10 @@ class Learner(pl.LightningModule, ABC):
         # TODO: what about scheduler?
         return self.optimizer
 
-    @classmethod
-    def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):
-        """Combines a predictor mixin with a learner, for comprehesnive inference"""
-        _cls = bind_classes(cls, predictor)
-        return _cls(*args, **kwargs)
+    # @classmethod
+    # def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):
+    #     """Combines a predictor mixin with a learner, for comprehesnive inference"""
+    #     _cls = bind_classes(cls, predictor)
+    #     return _cls(*args, **kwargs)
 
     ##########

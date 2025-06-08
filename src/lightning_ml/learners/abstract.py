@@ -28,9 +28,9 @@ class Supervised(Learner):
             Dict[str, Tensor]: _description_
         """
         out = {}
-        out["targets"] = batch["targets"]
-        out["outputs"] = self(batch["inputs"])
-        out["loss"] = self.criterion(out["outputs"], batch["targets"])
+        out["target"] = batch["target"]
+        out["output"] = self(batch["input"])
+        out["loss"] = self.criterion(out["output"], batch["target"])
         return out
 
 
@@ -45,6 +45,6 @@ class Unsupervised(Learner):
 
     def step(self, batch) -> Dict[str, Tensor]:
         out = {}
-        out["outputs"] = self.predict_step(batch)
-        out["loss"] = self.criterion(out["outputs"])
+        out["output"] = self(batch["input"])
+        out["loss"] = self.criterion(out["output"])
         return out
