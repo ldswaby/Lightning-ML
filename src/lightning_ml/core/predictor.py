@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import pytorch_lightning as pl
 
-from .learner import Learner
+if TYPE_CHECKING:  # pragma: no cover - for type hints only
+    from .learner import Learner
 
-__all__ = ["Predictor", "PredictorWrapper"]
+__all__ = ["PredictorMixin", "PredictorWrapper"]
 
 
 # class Predictor(ABC):
@@ -74,10 +75,10 @@ __all__ = ["Predictor", "PredictorWrapper"]
 #         return self.post_process(out)
 
 
-class Predictor(ABC):
+class PredictorMixin(ABC):
     """Wraps a learner with a predictor to override ``predict_step``."""
 
-    def __init__(self, learner: Learner) -> None:
+    def __init__(self, learner: "Learner") -> None:
         self._learner = learner
 
     @abstractmethod
