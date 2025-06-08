@@ -1,9 +1,9 @@
-from ..core import PredictorMixin
+from ..core import Predictor
 
 __all__ = ["Regression"]
 
 
-class Regression(PredictorMixin):
+class Regression(Predictor):
     """Basic regression predictor"""
 
     def post_process(self, preds):

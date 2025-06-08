@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import torch
 
-from . import Supervised, Unsupervised
+from lightning_ml.learners.abstract import Supervised, Unsupervised
 
 
 class SupContrastive(Supervised):

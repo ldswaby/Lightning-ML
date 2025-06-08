@@ -11,9 +11,9 @@ from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Accuracy, MetricCollection
 
 from src.lightning_ml.core.project import Project
+from src.lightning_ml.core import PredictorWrapper
 from src.lightning_ml.learners import Supervised
 from src.lightning_ml.predictors import Classification
-from src.lightning_ml.utils import bind_classes
 
 NUM_CLASSES = 3
 INPUT_SHAPE = (1, 28, 28)  # (C, H, W)
@@ -88,7 +88,7 @@ scheduler = None
 # #############  end dummy setup #############
 
 
-student = bind_classes(Supervised, Classification)(
+learner = Supervised(
     model=model,
     optimizer=optimizer,
     data=data,
@@ -97,6 +97,9 @@ student = bind_classes(Supervised, Classification)(
     scheduler=None,  # TODO
 )
 
+predictor = Classification()
+student = PredictorWrapper(learner, predictor)
+
 
 project = Project(student=student, trainer=Trainer())
 
@@ -104,6 +107,6 @@ project.train()
 
 # QUESTION: I don't like either of the above.
 # Why can't I define:
-# 1. Learner (with optionally combined PredictorMixin to make a 'student' - learner + optinal predictor)
+# 1. Learner (with optional ``PredictorWrapper`` to combine a predictor later)
 # 3. Trainer (pytorch_lighting.Trainer)
 # 4. Project object which combines all the above

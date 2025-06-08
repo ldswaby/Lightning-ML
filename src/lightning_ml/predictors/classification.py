@@ -1,11 +1,11 @@
 from torch import Tensor
 
-from ..core import PredictorMixin
+from ..core import Predictor
 
 __all__ = ["Classification"]
 
 
-class Classification(PredictorMixin):
+class Classification(Predictor):
     """Classification predictor"""
 
     def post_process(self, logits: Tensor) -> Tensor:

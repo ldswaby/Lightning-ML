@@ -2,9 +2,7 @@ from typing import Optional
 
 from pytorch_lightning import LightningDataModule, Trainer
 
-from ..utils import bind_classes
 from .learner import Learner
-from .predictor import PredictorMixin
 
 
 class Project:
@@ -19,7 +17,6 @@ class Project:
 
         Args:
             learner (Learner): _description_
-            predictor (PredictorMixin): _description_
             trainer (Optional[Trainer], optional): _description_. Defaults to None.
         """
         self.student = student
@@ -61,8 +58,3 @@ class Project:
             return getattr(self.trainer, item)
         raise AttributeError(item)
 
-    # @classmethod
-    # def from_trainer_kwargs(
-    #     cls, learner: Learner, predictor: PredictorMixin, *args, **kwargs
-    # ):
-    #     return cls(learner, predictor, Trainer(*args, **kwargs))

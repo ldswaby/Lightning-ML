@@ -15,7 +15,7 @@ Task can wrap it with specialized prediction logic in predict_step
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional
 
 import pytorch_lightning as pl
 from torch import Tensor, nn
@@ -23,8 +23,6 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
 from torchmetrics import MetricCollection
 
-from ..utils import bind_classes
-from .predictor import PredictorMixin
 
 
 class Learner(pl.LightningModule, ABC):
@@ -148,3 +146,4 @@ class Learner(pl.LightningModule, ABC):
         """
         # TODO: what about scheduler?
         return self.optimizer
+

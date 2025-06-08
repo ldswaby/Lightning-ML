@@ -4,7 +4,7 @@ BaseT = TypeVar("BaseT", bound=type)
 MixinT = TypeVar("MixinT", bound=type)
 
 
-__all__ = ["bind_classes"]
+__all__ = ["bind_classes", "bind"]
 
 
 @overload
@@ -56,3 +56,40 @@ def bind_classes(
     if name is None:
         name = f"{base_cls.__name__}{mixin_cls.__name__}"
     return type(name, (mixin_cls, base_cls), {})
+
+
+@overload
+def bind(obj: BaseT, mixin: None = None, name: str | None = ...) -> BaseT:
+    ...
+
+
+@overload
+def bind(obj: BaseT, mixin: MixinT, name: str | None = ...) -> Any:
+    ...
+
+
+def bind(obj: BaseT, mixin: Optional[MixinT] = None, name: str | None = None) -> Any:
+    """Mutate ``obj`` so that its class incorporates ``mixin``.
+
+    This is the instance-level analogue of :func:`bind_classes`.  The object's
+    ``__class__`` is replaced with a dynamically created subclass that mixes in
+    ``mixin`` so that its methods (e.g. ``predict_step``) override those of the
+    original class.  Attributes stored on ``mixin`` are shallow-copied onto the
+    target instance.
+
+    Args:
+        obj: The object to be modified in-place.
+        mixin: The mix-in instance whose behaviour should override ``obj``.
+        name: Optional name for the generated subclass.
+
+    Returns:
+        The modified ``obj``.
+    """
+
+    if mixin is None:
+        return obj
+
+    new_cls = bind_classes(obj.__class__, mixin.__class__, name)
+    obj.__class__ = new_cls
+    obj.__dict__.update(vars(mixin))
+    return obj
