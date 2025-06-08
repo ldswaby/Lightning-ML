@@ -15,7 +15,7 @@ Task can wrap it with specialized prediction logic in predict_step
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Dict
+from typing import Any
 
 from torch import Tensor
 
@@ -24,9 +24,9 @@ class Predictor:
     """Mixin that adds a Lightning-compatible predict_step."""
 
     @abstractmethod
-    def __call__(self, outputs: Dict[str, Tensor]) -> Any:
-        """Convert Learner.step outputs into task-specific predictions.
+    def __call__(self, outputs: Tensor) -> Any:
+        """Convert raw model outputs into task-specific predictions.
 
-        NOTE: outputs will always contain at least {'loss': Tensor}. Can also
-        contain 'output', 'target', additional tensors or scalars for logging.
+        Args:
+            outputs (Tensor): model outputs
         """

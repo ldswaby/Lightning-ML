@@ -187,8 +187,8 @@ class Learner(pl.LightningModule, ABC):
         Returns:
             _type_: _description_
         """
-        out = self.step(batch)  # user defined
-        return self.predictor(out)
+        out = self.step(batch)  # user-defined
+        return self.predictor(out["output"])
 
     # @classmethod
     # def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):
