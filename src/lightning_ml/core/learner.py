@@ -15,7 +15,7 @@ Task can wrap it with specialized prediction logic in predict_step
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Type
 
 import pytorch_lightning as pl
 from torch import Tensor, nn
@@ -23,8 +23,11 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
 from torchmetrics import MetricCollection
 
+from ..utils import bind_classes
+from . import PredictorMixin
 
-class Problem(pl.LightningModule, ABC):
+
+class Learner(pl.LightningModule, ABC):
     """
     Paradigm-agnostic Lightning template.
     Subclasses must implement `step` to compute a dict that at minimum
@@ -66,7 +69,7 @@ class Problem(pl.LightningModule, ABC):
         Must use self.predict_step if it is is to be compatible with Task wrappers
 
         Must return at least {'loss': Tensor}. Can also return
-        'preds', 'targets', additional tensors or scalars for logging.
+        'outputs', 'targets', additional tensors or scalars for logging.
         """
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
@@ -95,10 +98,10 @@ class Problem(pl.LightningModule, ABC):
 
         # Optional metrics
         if stage in self.metrics:
-            preds = out.get("preds")
+            outputs = out.get("outputs")
             targets = out.get("targets")
-            if preds is not None and targets is not None:
-                metric_vals = self.metrics[stage](preds, targets)
+            if outputs is not None and targets is not None:
+                metric_vals = self.metrics[stage](outputs, targets)
                 self.log_dict(
                     {f"{stage}_{k}": v for k, v in metric_vals.items()},
                     prog_bar=True,
@@ -145,5 +148,11 @@ class Problem(pl.LightningModule, ABC):
         """
         # TODO: what about scheduler?
         return self.optimizer
+
+    @classmethod
+    def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):
+        """Combines a predictor mixin with a learner, for comprehesnive inference"""
+        _cls = bind_classes(cls, predictor)
+        return _cls(*args, **kwargs)
 
     ##########

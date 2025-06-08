@@ -2,12 +2,12 @@ from typing import Dict
 
 from torch import Tensor
 
-from ..core import Problem
+from ..core import Learner
 
 __all__ = ["Supervised", "Unsupervised"]
 
 
-class Supervised(Problem):
+class Supervised(Learner):
     """
     Supervised learning base task.
 
@@ -16,8 +16,10 @@ class Supervised(Problem):
     * Parsed loss fn works directly on model outputs with no prior processing
     """
 
-    def step(self, batch) -> Dict[str, Tensor]:
-        """_summary_
+    def step(self, batch: Dict[str, Tensor]) -> Dict[str, Tensor]:
+        """
+        TODO: Note that assumed data batches always output dicts with at least
+        keys ['inputs', 'targets']. this can eb for a Supervised Dataset object
 
         Args:
             batch (_type_): _description_
@@ -25,17 +27,14 @@ class Supervised(Problem):
         Returns:
             Dict[str, Tensor]: _description_
         """
-        _, y = batch
-        logits = self.predict_step(batch)
-        loss = self.criterion(logits, y)
-        return {
-            "loss": loss,
-            "preds": logits,
-            "targets": y,
-        }
+        out = {}
+        out["targets"] = batch["targets"]
+        out["outputs"] = self(batch["inputs"])
+        out["loss"] = self.criterion(out["outputs"], batch["targets"])
+        return out
 
 
-class Unsupervised(Problem):
+class Unsupervised(Learner):
     """
     Unsupervised learning base task.
 
@@ -45,6 +44,7 @@ class Unsupervised(Problem):
     """
 
     def step(self, batch) -> Dict[str, Tensor]:
-        logits = self.predict_step(batch)
-        loss = self.criterion(logits)
-        return {"loss": loss}
+        out = {}
+        out["outputs"] = self.predict_step(batch)
+        out["loss"] = self.criterion(out["outputs"])
+        return out
