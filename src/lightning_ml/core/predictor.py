@@ -81,6 +81,13 @@ class PredictorMixin(pl.LightningModule, ABC):
     def __init__(self, learner: "Learner") -> None:
         super().__init__()
         self._learner = learner
+        # When the learner internally calls ``self.log`` or ``self.log_dict``
+        # these should route through this wrapper so that Lightning's Trainer
+        # manages the logging.  Without this redirection the learner would
+        # attempt to log while detached from the Trainer, leading to a
+        # ``MisconfigurationException``.
+        self._learner.log = self.log  # type: ignore[assignment]
+        self._learner.log_dict = self.log_dict  # type: ignore[assignment]
 
     # ------------------------------------------------------------------
     # Delegate all training, validation and test hooks to the wrapped
@@ -113,6 +120,17 @@ class PredictorMixin(pl.LightningModule, ABC):
         """Default prediction logic that delegates to the learner."""
         out = self._learner.predict_step(*args, **kwargs)
         return self.post_process(out)
+
+    # ------------------------------------------------------------------
+    # Ensure that the wrapped learner has access to the ``Trainer`` so
+    # logging utilities work as expected.  Lightning sets the ``trainer``
+    # attribute on the top-level module before ``setup`` is called, so we
+    # mirror that onto the underlying learner here.
+    # ------------------------------------------------------------------
+    def setup(self, stage: str | None = None) -> None:  # pragma: no cover - thin delegate
+        self._learner.trainer = self.trainer
+        if hasattr(self._learner, "setup"):
+            self._learner.setup(stage)
 
     def __getattr__(self, name):  # delegate attrs / hooks
         """Delegate missing attributes to the wrapped learner."""
