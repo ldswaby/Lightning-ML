@@ -148,11 +148,3 @@ class Learner(pl.LightningModule, ABC):
         """
         # TODO: what about scheduler?
         return self.optimizer
-
-    # @classmethod
-    # def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):
-    #     """Combines a predictor mixin with a learner, for comprehesnive inference"""
-    #     _cls = bind_classes(cls, predictor)
-    #     return _cls(*args, **kwargs)
-
-    ##########
