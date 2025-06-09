@@ -74,7 +74,7 @@ class Learner(pl.LightningModule, ABC):
     @predictor.setter
     def predictor(self, fn: Predictor | Callable[[Tensor], Any] | None) -> None:
         if fn is None:
-            fn = lambda x: x
+            fn = lambda x: x  # identity fn
         if not callable(fn):
             raise TypeError("predictor must be callable")
         self._predictor = fn
@@ -148,7 +148,9 @@ class Learner(pl.LightningModule, ABC):
             out["target"] = targets
         return out
 
-    def forward(self, *args: Any, **kwargs: Any) -> Any:  # pragma: no cover - thin wrapper
+    def forward(
+        self, *args: Any, **kwargs: Any
+    ) -> Any:  # pragma: no cover - thin wrapper
         return self.model(*args, **kwargs)
 
     def _shared_step(self, batch: Any, stage: str) -> Tensor:
@@ -210,4 +212,3 @@ class Learner(pl.LightningModule, ABC):
             "optimizer": self.optimizer,
             "lr_scheduler": self.scheduler,
         }
-
