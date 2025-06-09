@@ -9,6 +9,8 @@ from typing import Any, Callable, Optional, Sequence
 
 from .unlabelled import UnlabelledDataset
 
+__all__ = ["LabelledDataset"]
+
 
 class LabelledDataset(UnlabelledDataset):
     """Generic labelled dataset with optional transforms.
