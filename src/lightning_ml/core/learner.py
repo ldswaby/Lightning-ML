@@ -1,21 +1,14 @@
-"""
-Task abstraction for training, validation, and testing of PyTorch Lightning models.
+"""Base :class:`~pytorch_lightning.LightningModule` implementations.
 
-This module defines the Task base class that encapsulates the core components
-of a machine learning pipeline, including data modules, models, loss functions,
-optimizers, metrics, and schedulers.
-
-
-# TODO automcaticalay runs self[batch]
-
-Problem can be class below
-Task can wrap it with specialized prediction logic in predict_step
+This module defines the :class:`Learner` class which acts as a thin
+wrapper around a PyTorch ``nn.Module`` and handles training logic,
+metrics and prediction post-processing.
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional
 
 import pytorch_lightning as pl
 from torch import Tensor, nn
@@ -23,97 +16,143 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
 from torchmetrics import MetricCollection
 
-from ..utils import bind_classes
 from .predictor import Predictor
 
 
 class Learner(pl.LightningModule, ABC):
-    """
-    Paradigm-agnostic Lightning template.
-    Subclasses must implement `step` to compute a dict that at minimum
-    contains a `'loss'` Tensor. Anything else is optional.
-    """
+    """Abstract base class for training Lightning models."""
 
     def __init__(
         self,
         model: nn.Module,
         optimizer: Optimizer,
+        *,
         data: Optional[pl.LightningDataModule] = None,
-        criterion: Optional[Callable | nn.Module] = None,
+        criterion: Optional[Callable[[Any, Any], Tensor] | nn.Module] = None,
         metrics: Optional[dict[str, MetricCollection]] = None,
         scheduler: Optional[_LRScheduler] = None,
         predictor: Optional[Predictor] = None,
     ) -> None:
-        """
-        Initializes the Task with data, model, loss, optimizer, metrics, and scheduler.
+        """Initialise the learner.
 
-        Args:
-            data (pl.LightningDataModule): Data module for providing data loaders.
-            model (nn.Module): Neural network model to be trained.
-            criterion (nn.Module): Loss function used during training.
-            optimizer (Optimizer): Optimizer class or a callable that returns an optimizer instance when given parameters.
-            metrics (dict[str, MetricCollection], optional): Dictionary mapping stage names ('train', 'val', 'test') to MetricCollection instances. Defaults to None.
-            scheduler (_LRScheduler, optional): Learning rate scheduler instance. Defaults to None.
+        Parameters
+        ----------
+        model : nn.Module
+            Neural network model to be trained.
+        optimizer : Optimizer
+            Optimiser instance to be used during training.
+        data : Optional[pytorch_lightning.LightningDataModule], optional
+            Datamodule providing the data loaders, by default ``None``.
+        criterion : Callable or nn.Module, optional
+            Loss function used for optimisation, by default ``None``.
+        metrics : dict[str, MetricCollection], optional
+            Mapping from stage name (``"train"``, ``"val"``, ``"test"``) to metric
+            collections, by default ``None``.
+        scheduler : _LRScheduler, optional
+            Learning rate scheduler, by default ``None``.
+        predictor : Predictor, optional
+            Callable used to post-process raw model outputs during prediction,
+            by default ``None``.
         """
         super().__init__()
-        # self.save_hyperparameters(ignore=["model", "data", "criterion", "metrics"])
         self.model = model
         self.data = data
-        self.criterion = criterion  # may be None for e.g. GANs, BYOL, …
+        self.criterion = criterion
         self.metrics = metrics or {}
         self.optimizer = optimizer
         self.scheduler = scheduler
-        self.predictor = predictor  # fallback to identity fn
+        self.predictor = predictor
 
+    # ------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------
     @property
-    def predictor(self) -> Callable:
-        """Callable that post-processes the output of :meth:`predict_step`.
-
-        You can re-assign it after instantiation:
-
-        ```python
-        learner.predictor = my_custom_predictor
-        ```
-        """
+    def predictor(self) -> Callable[[Tensor], Any]:
+        """Prediction post-processing callable."""
         return self._predictor
 
     @predictor.setter
-    def predictor(self, fn: Callable | None) -> None:
-        """Validate and (re)assign the predictor.
-
-        If *fn* is ``None`` we fall back to an identity function so
-        :pymeth:`predict_step` continues to work.
-        """
+    def predictor(self, fn: Predictor | Callable[[Tensor], Any] | None) -> None:
         if fn is None:
-            fn = lambda x: x  # identity
+            fn = lambda x: x
         if not callable(fn):
             raise TypeError("predictor must be callable")
         self._predictor = fn
 
-    @abstractmethod
+    # ------------------------------------------------------------------
+    # Template methods
+    # ------------------------------------------------------------------
+    def get_inputs(self, batch: Any) -> Any:
+        """Extract inputs from ``batch``.
+
+        The default implementation expects ``batch`` to be a mapping with an
+        ``"input"`` key. Subclasses should override this method to customise
+        how inputs are retrieved.
+        """
+
+        return batch["input"]
+
+    def get_targets(self, batch: Any) -> Any:
+        """Extract targets from ``batch``.
+
+        The default implementation looks for a ``"target"`` key and will raise
+        ``KeyError`` if it does not exist. Unsupervised tasks can override this
+        to simply return ``None``.
+        """
+
+        return batch["target"]
+
+    def forward_batch(self, inputs: Any) -> Any:
+        """Run a forward pass on ``inputs`` using ``self.model``."""
+
+        return self(inputs)
+
+    def compute_loss(self, outputs: Any, targets: Any | None = None) -> Tensor:
+        """Compute the training loss.
+
+        Parameters
+        ----------
+        outputs : Any
+            Model outputs from :meth:`forward_batch`.
+        targets : Any, optional
+            Targets extracted by :meth:`get_targets`. Can be ``None`` for
+            unsupervised tasks.
+        """
+
+        if targets is None:
+            if self.criterion is None:
+                raise RuntimeError("criterion must be provided for loss computation")
+            return self.criterion(outputs)
+        return self.criterion(outputs, targets)
+
+    # ------------------------------------------------------------------
+    # Lightning hooks
+    # ------------------------------------------------------------------
     def step(self, batch: Any) -> Dict[str, Any]:
-        """
-        Must use self.predict_step if it is is to be compatible with Task wrappers
+        """Perform a single optimisation step.
 
-        Must return at least {'loss': Tensor}. Can also return
-        'output', 'target', additional tensors or scalars for logging.
+        This method orchestrates a typical training iteration using the
+        template methods defined above. Subclasses can override individual
+        template methods or the ``step`` method itself for full control.
         """
 
-    def forward(self, *args: Any, **kwargs: Any) -> Any:
+        inputs = self.get_inputs(batch)
+        outputs = self.forward_batch(inputs)
+        try:
+            targets = self.get_targets(batch)
+        except KeyError:
+            targets = None
+        loss = self.compute_loss(outputs, targets)
+        out: Dict[str, Any] = {"output": outputs, "loss": loss}
+        if targets is not None:
+            out["target"] = targets
+        return out
+
+    def forward(self, *args: Any, **kwargs: Any) -> Any:  # pragma: no cover - thin wrapper
         return self.model(*args, **kwargs)
 
-    # shared wrapper used by train/val/test hooks
     def _shared_step(self, batch: Any, stage: str) -> Tensor:
-        """Logic shared by train, test, and validation steps.
-
-        Args:
-            batch (Any): _description_
-            stage (str): _description_
-
-        Returns:
-            Tensor: _description_
-        """
-        out = self.step(batch)  # user-defined
+        out = self.step(batch)
         self.log(
             f"{stage}_loss",
             out["loss"],
@@ -123,7 +162,6 @@ class Learner(pl.LightningModule, ABC):
             batch_size=len(batch),
         )
 
-        # Optional metrics
         if stage in self.metrics:
             outputs = out.get("output")
             targets = out.get("target")
@@ -137,63 +175,39 @@ class Learner(pl.LightningModule, ABC):
                 )
         return out["loss"]
 
-    def training_step(self, batch, batch_idx) -> Tensor:
-        """Training step logic
-
-        Returns:
-            Tensor: loss
-        """
+    # -------------------- training/validation/test --------------------
+    def training_step(self, batch: Any, batch_idx: int) -> Tensor:
         return self._shared_step(batch, "train")
 
-    def validation_step(self, batch, batch_idx) -> None:
-        """Validation step logic"""
+    def validation_step(self, batch: Any, batch_idx: int) -> None:
         self._shared_step(batch, "val")
 
-    def test_step(self, batch, batch_idx) -> None:
-        """Test step logic"""
+    def test_step(self, batch: Any, batch_idx: int) -> None:
         self._shared_step(batch, "test")
 
     def on_train_epoch_start(self) -> None:
-        """Resets train metrics per epoch"""
         if "train" in self.metrics:
             self.metrics["train"].reset()
 
     def on_validation_epoch_start(self) -> None:
-        """Resets val metrics per epoch"""
         if "val" in self.metrics:
             self.metrics["val"].reset()
 
     def on_test_epoch_start(self) -> None:
-        """Resets test metrics per epoch"""
         if "test" in self.metrics:
             self.metrics["test"].reset()
 
-    def configure_optimizers(self) -> Optimizer:
-        """
-        Configure optimisers and, optionally, LR schedulers for
-        PyTorch-Lightning.
-        """
-        # TODO: what about scheduler?
-        return self.optimizer
+    # ---------------------- prediction ----------------------
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+        out = self.step(batch)
+        return self.predictor(out.get("output"))
 
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
-        """Predict step to override Problem.predict_step via MRO
+    # -------------------- optimizers --------------------
+    def configure_optimizers(self):  # pragma: no cover - simple passthrough
+        if self.scheduler is None:
+            return self.optimizer
+        return {
+            "optimizer": self.optimizer,
+            "lr_scheduler": self.scheduler,
+        }
 
-        Args:
-            batch (_type_): _description_
-            batch_idx (_type_): _description_
-            dataloader_idx (int, optional): _description_. Defaults to 0.
-
-        Returns:
-            _type_: _description_
-        """
-        out = self.step(batch)  # user-defined
-        return self.predictor(out["output"])
-
-    # @classmethod
-    # def with_predictor(cls, predictor: Type[PredictorMixin], *args, **kwargs):
-    #     """Combines a predictor mixin with a learner, for comprehesnive inference"""
-    #     _cls = bind_classes(cls, predictor)
-    #     return _cls(*args, **kwargs)
-
-    ##########

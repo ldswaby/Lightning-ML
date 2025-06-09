@@ -1,32 +1,38 @@
-"""
-Task abstraction for training, validation, and testing of PyTorch Lightning models.
+"""Utilities for post-processing model outputs.
 
-This module defines the Task base class that encapsulates the core components
-of a machine learning pipeline, including data modules, models, loss functions,
-optimizers, metrics, and schedulers.
-
-
-# TODO automcaticalay runs self[batch]
-
-Problem can be class below
-Task can wrap it with specialized prediction logic in predict_step
+This module defines the :class:`Predictor` base class used to convert raw
+model outputs into task-specific predictions. Predictor objects are
+callable and are typically assigned to a :class:`Learner` instance to
+customise the behaviour of ``predict_step``.
 """
 
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any
 
 from torch import Tensor
 
 
-class Predictor:
-    """Mixin that adds a Lightning-compatible predict_step."""
+class Predictor(ABC):
+    """Callable used by :class:`Learner` to post-process model outputs."""
 
     @abstractmethod
     def __call__(self, outputs: Tensor) -> Any:
-        """Convert raw model outputs into task-specific predictions.
+        """Convert model outputs into predictions.
 
-        Args:
-            outputs (Tensor): model outputs
+        Parameters
+        ----------
+        outputs : Tensor
+            Raw outputs produced by a model's forward pass.
+
+        Returns
+        -------
+        Any
+            Processed predictions ready to be consumed by downstream
+            applications.
         """
+
+        ...
+
+
