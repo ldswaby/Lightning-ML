@@ -1,3 +1,7 @@
+"""Predictor for classification problems."""
+
+from __future__ import annotations
+
 from torch import Tensor
 
 from ..core import Predictor
@@ -6,7 +10,7 @@ __all__ = ["Classification"]
 
 
 class Classification(Predictor):
-    """Classification predictor"""
+    """Map model logits to class labels."""
 
     def __init__(self, softmax: bool = True) -> None:
         self.softmax = softmax
@@ -15,3 +19,4 @@ class Classification(Predictor):
         if self.softmax:
             outputs = outputs.softmax(dim=-1)
         return outputs.argmax(dim=-1)
+

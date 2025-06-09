@@ -1,3 +1,5 @@
+"""Implementations of contrastive learning paradigms."""
+
 from __future__ import annotations
 
 from typing import Any, Dict, Tuple
@@ -10,12 +12,7 @@ __all__ = ["ContrastiveSupervised", "ContrastiveUnsupervised"]
 
 
 class ContrastiveSupervised(Supervised):
-    """Supervised contrastive learning task.
-
-    Expects batches to contain two augmented views of each input along with
-    targets. The criterion should accept ``(z1, z2, target)`` and return a
-    scalar loss tensor.
-    """
+    """Supervised contrastive learning task."""
 
     def get_inputs(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
         return batch["view1"], batch["view2"]
@@ -32,11 +29,7 @@ class ContrastiveSupervised(Supervised):
 
 
 class ContrastiveUnsupervised(Unsupervised):
-    """Unsupervised contrastive learning task.
-
-    Expects batches containing two augmented views of each sample. The
-    criterion should accept ``(z1, z2)`` and return a scalar loss tensor.
-    """
+    """Unsupervised contrastive learning task."""
 
     def get_inputs(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
         return batch["view1"], batch["view2"]
@@ -50,3 +43,4 @@ class ContrastiveUnsupervised(Unsupervised):
     def compute_loss(self, outputs: Tuple[Tensor, Tensor]) -> Tensor:
         z1, z2 = outputs
         return self.criterion(z1, z2)
+
