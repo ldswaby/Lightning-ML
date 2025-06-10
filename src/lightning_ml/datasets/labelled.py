@@ -7,12 +7,12 @@ input and target sequences.
 
 from typing import Any, Callable, Optional, Sequence
 
-from .unlabelled import UnlabelledDataset
+from .abstract import LabelledDatasetBase
 
 __all__ = ["LabelledDataset"]
 
 
-class LabelledDataset(UnlabelledDataset):
+class LabelledDataset(LabelledDatasetBase):
     """Generic labelled dataset with optional transforms.
 
     Args:
@@ -42,10 +42,18 @@ class LabelledDataset(UnlabelledDataset):
         if len(inputs) != len(targets):
             raise ValueError("inputs and targets must have the same length")
 
-        super().__init__(inputs, transform=transform)
-
+        self._inputs = inputs
         self._targets = targets
+        self.transform = transform or (lambda x: x)
         self.target_transform = target_transform or (lambda y: y)
+
+    def __len__(self) -> int:
+        """Return number of samples."""
+        return len(self._inputs)
+
+    def get_input(self, idx: int) -> Any:
+        """Transformed input lookup."""
+        return self.transform(self._inputs[idx])
 
     def get_target(self, idx: int) -> Any:
         """Raw (un-transformed) target lookup."""
