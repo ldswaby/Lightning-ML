@@ -111,7 +111,7 @@ class ContrastiveUnlabelledDataset(UnlabelledDataset, ContastiveDatasetBase):
         Returns:
             Any: Augmented positive view of the sample.
         """
-        return self.transform(self.get_input(idx))
+        return self.get_input(idx)
 
 
 class TripletDataset(ContrastiveLabelledDataset, TripletDatasetBase):

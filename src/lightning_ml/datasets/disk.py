@@ -1,4 +1,4 @@
-"""Common dataset implementations leveraging existing mix-ins."""
+"""Common dataset implementations that load from disk, leveraging existing mix-ins."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ class NumpyUnlabelledDataset(UnlabelledDataset):
     ) -> None:
         if isinstance(inputs, str):
             inputs = np.load(inputs)
-        super().__init__(list(inputs), transform=transform)
+        super().__init__(inputs, transform=transform)
 
 
 class NumpyLabelledDataset(LabelledDataset):
@@ -50,8 +50,8 @@ class NumpyLabelledDataset(LabelledDataset):
         if isinstance(targets, str):
             targets = np.load(targets)
         super().__init__(
-            list(inputs),
-            list(targets),
+            inputs,
+            targets,
             transform=transform,
             target_transform=target_transform,
         )
