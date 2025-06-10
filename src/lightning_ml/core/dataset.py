@@ -52,6 +52,8 @@ class DatasetMeta(ABCMeta):
             if k not in keys_list:
                 keys_list.append(k)
         keys = keys_list
+        # ensure the resulting class exposes the aggregated keys
+        namespace["sample_keys"] = keys
 
         # For each key, ensure there’s a get_<key>; if not, create an abstract
         # stub
