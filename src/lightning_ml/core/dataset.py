@@ -57,9 +57,10 @@ class DatasetMeta(ABCMeta):
         if keys:
             for key in keys:
                 method_name = f"get_{key}"
-                if method_name not in namespace:
+                if method_name not in namespace and not any(
+                    hasattr(base, method_name) for base in bases
+                ):
                     # define an abstractmethod stub
-                    # define a stub that just raises NotImplementedError
                     def _stub(self, idx: int, _method_name=method_name):
                         raise NotImplementedError(
                             f"{name} must implement `{_method_name}`"
