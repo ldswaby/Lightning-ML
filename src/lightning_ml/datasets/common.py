@@ -49,7 +49,12 @@ class NumpyLabelledDataset(LabelledDataset):
             inputs = np.load(inputs)
         if isinstance(targets, str):
             targets = np.load(targets)
-        super().__init__(list(inputs), list(targets), transform=transform, target_transform=target_transform)
+        super().__init__(
+            list(inputs),
+            list(targets),
+            transform=transform,
+            target_transform=target_transform,
+        )
 
 
 class CSVDataset(LabelledDataset):
@@ -68,7 +73,9 @@ class CSVDataset(LabelledDataset):
         df = pd.read_csv(csv_path, **(pandas_kwargs or {}))
         inputs = df[input_cols].values
         targets = df[target_col].values
-        super().__init__(inputs, targets, transform=transform, target_transform=target_transform)
+        super().__init__(
+            inputs, targets, transform=transform, target_transform=target_transform
+        )
 
 
 class ImageFolderDataset(LabelledDataset):
@@ -99,10 +106,11 @@ class ImageFolderDataset(LabelledDataset):
                     inputs.append(os.path.join(class_dir, fname))
                     targets.append(self.class_to_idx[cls_name])
 
-        super().__init__(inputs, targets, transform=None, target_transform=target_transform)
+        super().__init__(
+            inputs, targets, transform=None, target_transform=target_transform
+        )
 
     def get_input(self, idx: int) -> Any:
         path = self._inputs[idx]
         img = Image.open(path).convert("RGB")
         return self.image_transform(img)
-

@@ -21,7 +21,10 @@ __all__ = [
 
 
 class InputMixin(BaseDataset):
-    """Dataset mix-in that mandates a `get_input` method."""
+    """Dataset mix-in that mandates a `get_input` method, the output of which
+    will be added to the `__getitem__` ouput dict of all subclasses with key
+    "input".
+    """
 
     sample_keys = ["input"]
 

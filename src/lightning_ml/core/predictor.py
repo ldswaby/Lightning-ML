@@ -32,7 +32,3 @@ class Predictor(ABC):
             Processed predictions ready to be consumed by downstream
             applications.
         """
-
-        ...
-
-
