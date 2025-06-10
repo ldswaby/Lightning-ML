@@ -1,6 +1,11 @@
 import numpy as np
 
-from src.lightning_ml.datasets import LabelledDataset, NumpyLabelledDataset
+from src.lightning_ml.datasets import (
+    ContrastiveLabelledDataset,
+    LabelledDataset,
+    NumpyLabelledDataset,
+    TripletDataset,
+)
 
 # Set random seed for reproducibility
 np.random.seed(42)
@@ -13,5 +18,6 @@ X = np.random.randn(100, 2)
 y = (X[:, 0] + X[:, 1] > 0).astype(int)
 
 
-dataset = NumpyLabelledDataset(X, y)
+ds = TripletDataset(X, y)
+breakpoint()
 print(dataset.sample_keys)

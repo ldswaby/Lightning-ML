@@ -17,7 +17,7 @@ from .unlabelled import UnlabelledDataset
 __all__ = [
     "ContrastiveLabelledDataset",
     "ContrastiveUnlabelledDataset",
-    "TripletLabelledDataset",
+    "TripletDataset",
 ]
 
 
@@ -114,7 +114,7 @@ class ContrastiveUnlabelledDataset(UnlabelledDataset, ContastiveDatasetBase):
         return self.transform(self._inputs[idx])
 
 
-class TripletLabelledDataset(ContrastiveLabelledDataset, TripletDatasetBase):
+class TripletDataset(ContrastiveLabelledDataset, TripletDatasetBase):
     """
     Triplet dataset returning (anchor, positive, negative) given class labels.
 
