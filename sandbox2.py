@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.lightning_ml.datasets import NumpyLabelledDataset
+from src.lightning_ml.datasets import LabelledDataset, NumpyLabelledDataset
 
 # Set random seed for reproducibility
 np.random.seed(42)
@@ -14,3 +14,4 @@ y = (X[:, 0] + X[:, 1] > 0).astype(int)
 
 
 dataset = NumpyLabelledDataset(X, y)
+print(dataset.sample_keys)

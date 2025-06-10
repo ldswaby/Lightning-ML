@@ -53,7 +53,8 @@ class DatasetMeta(ABCMeta):
                 keys_list.append(k)
         keys = keys_list
 
-        # For each key, ensure there’s a get_<key>; if not, create an abstract stub
+        # For each key, ensure there’s a get_<key>; if not, create an abstract
+        # stub
         if keys:
             for key in keys:
                 method_name = f"get_{key}"
