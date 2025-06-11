@@ -5,8 +5,6 @@ import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 
-from lightning_ml.core import dataset
-
 from .dataset import BaseDataset
 
 
