@@ -1,6 +1,14 @@
 # Lightning-ML
 
-Lightning-ML is a lightweight research framework built on top of [PyTorch Lightning](https://www.pytorchlightning.ai/). It provides a small collection of abstractions that help organise datasets, models and training logic while remaining compatible with the Lightning ecosystem.
+*NOTE*: This is a personal repository designed to serve as a quick-start framework for future machine learning (ML) projects.
+
+Built on top of [PyTorch Lightning](https://www.pytorchlightning.ai/), it provides modular libraries for all major components of the standard ML pipeline: datasets, models, loss functions, optimizers, and evaluation metrics. These are automatically chained together (either programmatically or through config files) in a lightweight, easily configurable manner, enabling rapid development and deployment of ML projects from scratch.
+
+The codebase structure is based on a simple conceptualisation of end-to-end ML projects consisting of:
+1. A `Learner`: a *learning problem*, consisting of learning material (`data`), a learning agent (`model`), and a learning method (`loss` + `optimizer`).
+2. A `Predictor`: A *downstream task* to which the learning agent applies its newly aquired knowledge (e.g. `Classification`, `Multiregression`). This more lightweight component will typically just add some additional post-processing steps to `Learner`'s outputs (e.g. softmax + argmax for classification).
+
+We divorce the two to preserve the ability to use models trained in one way to be ultimately used in others (e.g. a self-supervised contrastive learner used for classification)
 
 ## Features
 
