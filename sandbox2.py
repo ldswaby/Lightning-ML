@@ -18,6 +18,14 @@ X = np.random.randn(100, 2)
 # Label = 1 if x1 + x2 > 0, else 0
 y = (X[:, 0] + X[:, 1] > 0).astype(int)
 
+dset = NumpyLabelledDataset("data/X.npy", "data/y.npy")
+
+breakpoint()
+
+
+# Later, open a memmap:
+mmap = np.load("data/y.npy", mmap_mode="r")
+
 
 dm = DataModule(
     dataset_cls=TripletDataset,

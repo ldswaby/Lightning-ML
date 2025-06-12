@@ -85,7 +85,7 @@ class Classification(Predictor):
             outputs = outputs.softmax(dim=-1)
 
         class_idx = outputs.argmax(dim=-1)
-        if not return_labels:  # Return class indices
+        if not return_labels:
             return class_idx
 
         return self._map_labels(class_idx.tolist())

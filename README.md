@@ -2,7 +2,7 @@
 
 *NOTE*: This is a personal repository designed to serve as a quick-start framework for future machine learning (ML) projects.
 
-Built on top of [PyTorch Lightning](https://www.pytorchlightning.ai/), it provides modular libraries for all major components of the standard ML pipeline: datasets, models, loss functions, optimizers, and evaluation metrics. These are automatically piped together (either programmatically or through config files) in a lightweight, easily configurable manner, enabling rapid development and deployment of ML projects from scratch.
+Built on top of [PyTorch Lightning](https://www.pytorchlightning.ai/), it provides modular libraries for all major components of the standard ML pipeline: datasets, models, loss functions, optimizers, and evaluation metrics. These are automatically piped together in a lightweight, easily configurable manner (either programmatically or through config files), enabling rapid development and deployment of ML projects from scratch.
 
 The codebase structure is based on a simple conceptualisation of end-to-end ML projects consisting of:
 1. A `Learner`: a *learning problem*, consisting of learning material (`data`), a learning agent (`model`), and a learning method (`loss` + `optimizer`).
