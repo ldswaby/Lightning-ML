@@ -18,6 +18,7 @@ __all__ = [
     "get_summary",
     "ensure_has_attributes",
     "get_dataclass_fields",
+    "get_class_parameters",
 ]
 
 
@@ -165,3 +166,12 @@ def get_dataclass_fields(obj: Any) -> List[str]:
     if is_dataclass(cls):
         return [f.name for f in fields(cls)]
     raise TypeError(f"{cls.__name__} is not a dataclass")
+
+
+def get_class_parameters(obj: Any) -> List[str]:
+    """
+    If `obj` is a class or instance thereof, return its parameter names.
+    """
+    cls = obj if inspect.isclass(obj) else obj.__class__
+    sig = inspect.signature(cls)
+    return list(sig.parameters)

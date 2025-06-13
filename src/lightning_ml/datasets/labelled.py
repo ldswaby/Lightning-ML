@@ -51,6 +51,11 @@ class LabelledDataset(LabelledDatasetBase):
         """Return number of samples."""
         return len(self._inputs)
 
+    @property
+    def targets(self) -> Sequence[Any]:
+        """Return all targets"""
+        return self._targets
+
     def get_input(self, idx: int) -> Any:
         """Transformed input lookup."""
         return self.transform(self._inputs[idx])

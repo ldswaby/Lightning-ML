@@ -6,6 +6,8 @@ This module provides:
 - UnlabelledDatasetBase, LabelledDatasetBase, ContastiveDatasetBase, TripletDatasetBase: abstract dataset base classes combining mix-ins.
 """
 
+from typing import Any, Sequence
+
 from ..core import BaseDataset
 
 __all__ = [
@@ -27,6 +29,10 @@ class InputMixin(BaseDataset):
     """
 
     sample_keys = ["input"]
+
+    @property
+    def in_shape(self):
+        return self.get_input(0).shape
 
 
 class TargetMixin(BaseDataset):

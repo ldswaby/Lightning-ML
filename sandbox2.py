@@ -7,6 +7,7 @@ from src.lightning_ml.datasets import (
     NumpyLabelledDataset,
     TripletDataset,
 )
+from src.lightning_ml.utils.data.splitters import ShuffleSplit
 
 # Set random seed for reproducibility
 np.random.seed(42)
@@ -18,13 +19,19 @@ X = np.random.randn(100, 2)
 # Label = 1 if x1 + x2 > 0, else 0
 y = (X[:, 0] + X[:, 1] > 0).astype(int)
 
-dset = NumpyLabelledDataset("data/X.npy", "data/y.npy")
+dset = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
+
+splitter = ShuffleSplit(n_splits=1)
+
+train = []
+test = []
+
+for train_index, test_index in splitter.split(X):
+    breakpoint()
+    train.extend(train_index.tolist())
+    test.extend(test_index.tolist())
 
 breakpoint()
-
-
-# Later, open a memmap:
-mmap = np.load("data/y.npy", mmap_mode="r")
 
 
 dm = DataModule(

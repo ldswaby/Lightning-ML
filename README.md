@@ -10,6 +10,13 @@ The codebase structure is based on a simple conceptualisation of end-to-end ML p
 
 We divorce the two to preserve the ability to use models trained in one way to be ultimately used in others (e.g. a self-supervised contrastive learner used for classification)
 
+The true power of this repository is that it chains togetehr libraries from other popular ML packages. E.g., on top of any custom defined, you have automatic access to:
+
+* `torchvision` and `torchaudio` datasets and models
+* `torch.nn` loss functions
+* `sklearn` data splitters
+* `torchmetrics` evaluation metrics
+
 ## Features
 
 - **Modular learners** – `Learner` classes wrap your `nn.Module` and define the training, validation and prediction steps.
@@ -76,3 +83,9 @@ The framework stays intentionally small and flexible so you can plug in any PyTo
 ## License
 
 This project is released under the terms of the MIT license. See [LICENSE](LICENSE) for details.
+
+
+# Splitters
+* CV is for validation, not deployment.
+* Final model = retrained on all training data using the best config found via CV.
+* So really we just split into
