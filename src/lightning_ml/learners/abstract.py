@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from torch import Tensor
 
@@ -14,35 +14,30 @@ __all__ = ["Supervised", "Unsupervised"]
 class Supervised(Learner):
     """Generic supervised learning task."""
 
-    # ------------------------------------------------------------------
-    # Template methods
-    # ------------------------------------------------------------------
-    def get_inputs(self, batch: Dict[str, Tensor]) -> Any:
-        """Extract inputs from ``batch``."""
+    def process_batch(self, batch: Dict[str, Any]) -> Any:
+        """Extract inputs from ``batch`` for `self.forward`."""
         return batch["input"]
 
-    def get_targets(self, batch: Dict[str, Tensor]) -> Any:
-        """Extract targets from ``batch``."""
-        return batch["target"]
+    def forward(self, *args: Any, **kwargs: Any) -> Any:
+        """Forward hook to underlying model `self.model`"""
+        return self.model(*args, **kwargs)
 
-    def forward_batch(self, inputs: Any) -> Any:
-        """Forward pass over ``inputs``."""
-        return self(inputs)
-
-    def compute_loss(self, outputs: Any, targets: Any) -> Tensor:
-        """Compute loss given ``outputs`` and ``targets``."""
-        return self.criterion(outputs, targets)
+    def compute_loss(self, model_outputs: Any, targets: Optional[Any] = None) -> Tensor:
+        """Compute loss given raw ``model_outputs`` and ``targets``."""
+        return self.criterion(model_outputs, targets)
 
 
 class Unsupervised(Learner):
     """Generic unsupervised learning task."""
 
-    def get_inputs(self, batch: Dict[str, Tensor]) -> Any:
+    def process_batch(self, batch: Dict[str, Any]) -> Any:
+        """Extract inputs from ``batch`` for model."""
         return batch["input"]
 
-    def forward_batch(self, inputs: Any) -> Any:
-        return self(inputs)
+    def forward(self, *args: Any, **kwargs: Any) -> Any:
+        """Forward hook to underlying model `self.model`"""
+        return self.model(*args, **kwargs)
 
-    def compute_loss(self, outputs: Any) -> Tensor:
-        return self.criterion(outputs)
-
+    def compute_loss(self, model_outputs: Any, targets: Optional[Any] = None) -> Tensor:
+        """Compute loss given raw ``model_outputs`` and ``targets``."""
+        return self.criterion(model_outputs)
