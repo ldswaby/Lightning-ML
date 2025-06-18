@@ -17,6 +17,9 @@ The true power of this repository is that it chains togetehr libraries from othe
 * `sklearn` data splitters
 * `torchmetrics` evaluation metrics
 
+
+To define a learner, you have to define the code that pipes a batch to model output(s) (`batch_forward`), and how to get from these to a loss value (`compute_loss`)
+
 ## Features
 
 - **Modular learners** – `Learner` classes wrap your `nn.Module` and define the training, validation and prediction steps.

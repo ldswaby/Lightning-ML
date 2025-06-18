@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from .abstract import *  # noqa: F401,F403
-from .contrastive import *  # noqa: F401,F403
+from .contrastive import *
+from .supervised import Supervised
+from .unsupervised import Unsupervised
 
 __all__ = [
     "Supervised",
@@ -11,4 +12,3 @@ __all__ = [
     "ContrastiveSupervised",
     "ContrastiveUnsupervised",
 ]
-

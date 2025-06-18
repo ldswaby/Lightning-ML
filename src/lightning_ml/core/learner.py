@@ -47,33 +47,19 @@ class Learner(pl.LightningModule, ABC):
         """
         # Initialize the LightningModule base
         super().__init__()
-        self.model = model  # Underlying PyTorch model
-        self.data_module = (
-            data_module  # Data module providing train/val/test dataloaders
-        )
-        self.criterion = criterion  # Loss function or module
-        self.metrics = metrics or {}  # Mapping of stage names to MetricCollection
-        self.optimizer = optimizer  # Optimizer for training
-        self.scheduler = scheduler  # Optional learning rate scheduler
-        self.predictor = predictor  # Post-processing for predictions
+        self.model = model
+        self.data_module = data_module
+        self.criterion = criterion
+        self.metrics = metrics or {}
+        self.optimizer = optimizer
+        self.scheduler = scheduler
+        self.predictor = predictor or (lambda x: x)
 
     @abstractmethod
-    def process_batch(self, batch: Dict[str, Any]) -> Any:
-        """Extract inputs from a batch for the model.
+    def batch_forward(self, batch: Dict[str, Any]) -> Any:
+        """Extract inputs from ``batch`` and runs through model.
 
-        outputs will go straight into `self.forward`
-
-        Args:
-            batch (Dict[str, Any]): Batch data from DataLoader.
-
-        Returns:
-            Any: Inputs formatted for the model's forward method.
-        """
-
-    @abstractmethod
-    def forward(self, *args: Any, **kwargs: Any) -> Any:
-        """Forward hook to underlying model `self.model`
-        outputs will go straihgt into `self.compute_loss`
+        `Outputs for this function go directly in self.compute_loss`
         """
 
     @abstractmethod
@@ -101,6 +87,10 @@ class Learner(pl.LightningModule, ABC):
             raise TypeError("predictor must be callable")
         self._predictor = fn
 
+    def forward(self, *args: Any, **kwargs: Any) -> Any:
+        """Forward hook"""
+        return self.model(*args, **kwargs)
+
     def step(self, batch: Any, stage: str) -> Dict[str, Tensor]:
         """Run a single step for a given stage.
 
@@ -113,8 +103,7 @@ class Learner(pl.LightningModule, ABC):
         """
         # Prepare inputs and perform forward pass
         logs = {}
-        logs["inputs"] = self.process_batch(batch)
-        logs["outputs"] = self(*logs["inputs"])
+        logs["outputs"] = self.batch_forward(batch)
         logs["loss"] = self.compute_loss(logs["outputs"], batch.get("target"))
 
         # Log the loss for this stage
