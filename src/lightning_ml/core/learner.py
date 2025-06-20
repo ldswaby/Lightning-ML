@@ -32,7 +32,7 @@ class Learner(pl.LightningModule, ABC):
         criterion: Optional[Callable[[Any, Any], Tensor] | nn.Module] = None,
         metrics: Optional[Dict[str, MetricCollection]] = None,
         scheduler: Optional[_LRScheduler] = None,
-        predictor: Optional[Predictor] = None,
+        predictor: Optional[Predictor | Callable[[Tensor], Any]] = None,
     ) -> None:
         """Initialize the Learner.
 
@@ -53,7 +53,7 @@ class Learner(pl.LightningModule, ABC):
         self.metrics = metrics or {}
         self.optimizer = optimizer
         self.scheduler = scheduler
-        self.predictor = predictor or (lambda x: x)
+        self.predictor = predictor  # fallback to identity fn
 
     @abstractmethod
     def batch_forward(self, batch: Dict[str, Any]) -> Any:

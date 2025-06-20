@@ -1,8 +1,9 @@
 import numpy as np
+from pytorch_lightning import Trainer
 from torch import Tensor, nn, optim
 from torchmetrics import Accuracy, F1Score, MetricCollection, Precision, Recall
 
-from src.lightning_ml.core import DataModule
+from src.lightning_ml.core import DataModule, Project
 from src.lightning_ml.datasets import (
     ContrastiveLabelledDataset,
     LabelledDataset,
@@ -17,6 +18,7 @@ class NumpyDataModule(DataModule):
 
     def define_datasets(self) -> None:
         self.datasets["train"] = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
+        self.datasets["val"] = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
         return
 
 
@@ -57,4 +59,7 @@ learner = Supervised(
     # predictor: Optional[Predictor] = None,
 )
 
-breakpoint()
+project = Project(learner=learner, trainer=Trainer())
+
+
+project.train()

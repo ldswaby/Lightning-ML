@@ -19,9 +19,9 @@ class DataModule(LightningDataModule, ABC):
 
     splits = {"train", "val", "test"}
 
-    def __init__(self):
+    def __init__(self, **dataloader_kwargs):
         super().__init__()
-        self._dataloader_kwargs = {}
+        self._dataloader_kwargs = dataloader_kwargs
         self.datasets: Dict[str, BaseDataset] = {}
 
     @abstractmethod

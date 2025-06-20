@@ -1,7 +1,5 @@
 """High level interface for training and inference."""
 
-from __future__ import annotations
-
 from typing import Optional
 
 from pytorch_lightning import LightningDataModule, Trainer
@@ -28,9 +26,9 @@ class Project:
 
     # ------------------------------------------------------------------
     @property
-    def data(self) -> LightningDataModule | None:
-        """Convenience access to the learner's datamodule."""
-        return self.learner.data
+    def data(self) -> Optional[LightningDataModule]:
+        """Convenience access to the learner's data_module."""
+        return self.learner.data_module
 
     # ------------------------------------------------------------------
     # Convenience wrappers around ``Trainer`` methods
@@ -59,4 +57,3 @@ class Project:
         if hasattr(self.trainer, item):
             return getattr(self.trainer, item)
         raise AttributeError(item)
-
