@@ -30,6 +30,7 @@ def test_numpy_labelled_dataset_instantiation():
     sys.modules['pytorch_lightning'] = pl
 
     sys.modules['pandas'] = types.ModuleType('pandas')
+    sys.modules['numpy'] = types.ModuleType('numpy')
     PIL = types.ModuleType('PIL'); PIL_Image = types.ModuleType('PIL.Image')
     sys.modules['PIL'] = PIL; sys.modules['PIL.Image'] = PIL_Image
 
@@ -42,8 +43,8 @@ def test_numpy_labelled_dataset_instantiation():
     _load('lightning_ml.datasets.abstract', BASE / 'datasets/abstract.py')
     _load('lightning_ml.datasets.unlabelled', BASE / 'datasets/unlabelled.py')
     _load('lightning_ml.datasets.labelled', BASE / 'datasets/labelled.py')
-    common = _load('lightning_ml.datasets.common', BASE / 'datasets/common.py')
+    disk = _load('lightning_ml.datasets.disk', BASE / 'datasets/disk.py')
 
-    ds = common.NumpyLabelledDataset([1, 2], [3, 4])
+    ds = disk.NumpyLabelledDataset([1, 2], [3, 4])
     assert len(ds) == 2
 
