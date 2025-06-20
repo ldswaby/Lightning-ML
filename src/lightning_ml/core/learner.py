@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, Optional
 
 import pytorch_lightning as pl
 from torch import Tensor, nn
+from torch.nn import ModuleDict
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
 from torchmetrics import MetricCollection
@@ -41,7 +42,9 @@ class Learner(pl.LightningModule, ABC):
             optimizer (Optimizer): Optimizer for training.
             data_module (Optional[pl.LightningDataModule], optional): Data module for data loaders. Defaults to None.
             criterion (Optional[Callable[[Any, Any], Tensor] or nn.Module], optional): Loss function. Defaults to None.
-            metrics (Optional[Dict[str, MetricCollection]], optional): Stage-to-metric mapping. Defaults to None.
+        metrics (Optional[Dict[str, MetricCollection]], optional): Mapping of stage name
+                to a :class:`~torchmetrics.MetricCollection`. These will be registered
+                as modules to ensure they follow the Learner's device.
             scheduler (_LRScheduler, optional): Learning rate scheduler. Defaults to None.
             predictor (Predictor, optional): Post-processing function for predictions. Defaults to None.
         """
@@ -50,7 +53,8 @@ class Learner(pl.LightningModule, ABC):
         self.model = model
         self.data_module = data_module
         self.criterion = criterion
-        self.metrics = metrics or {}
+        # register metrics so Lightning moves them to the correct device
+        self.metrics = ModuleDict(metrics or {})
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.predictor = predictor  # fallback to identity fn
