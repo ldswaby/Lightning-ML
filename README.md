@@ -35,7 +35,7 @@ To define a learner, you have to define the code that pipes a batch to model out
 src/lightning_ml/
 ├── core/        # base classes: Learner, Predictor, Dataset, DataModule, Project
 ├── datasets/    # dataset mix-ins and concrete dataset implementations
-├── learners/    # common learning paradigms (Supervised, Unsupervised, Contrastive)
+├── learners/    # common learning paradigms (Supervised, Unsupervised, Contrastive, SemiSupervised)
 ├── models/      # model registry and example model
 ├── predictors/  # output post-processing utilities
 └── utils/       # helper functions (registries, class binding, ...)
