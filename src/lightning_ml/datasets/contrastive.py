@@ -10,6 +10,7 @@ This module provides:
 import random
 from typing import Any, Callable, Optional, Sequence
 
+from . import DATASET_REG
 from .abstract import ContastiveDatasetBase, TripletDatasetBase
 from .labelled import LabelledDataset
 from .unlabelled import UnlabelledDataset
@@ -21,6 +22,7 @@ __all__ = [
 ]
 
 
+@DATASET_REG.register()
 class ContrastiveLabelledDataset(LabelledDataset, ContastiveDatasetBase):
     """
     In-memory contrastive dataset for labelled data.
@@ -76,6 +78,7 @@ class ContrastiveLabelledDataset(LabelledDataset, ContastiveDatasetBase):
         return self.get_input(pos_idx)
 
 
+@DATASET_REG.register()
 class ContrastiveUnlabelledDataset(UnlabelledDataset, ContastiveDatasetBase):
     """
     Contrastive dataset without labels.
@@ -114,6 +117,7 @@ class ContrastiveUnlabelledDataset(UnlabelledDataset, ContastiveDatasetBase):
         return self.get_input(idx)
 
 
+@DATASET_REG.register()
 class TripletDataset(ContrastiveLabelledDataset, TripletDatasetBase):
     """
     Triplet dataset returning (anchor, positive, negative) given class labels.

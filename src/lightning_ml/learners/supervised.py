@@ -4,9 +4,11 @@ from typing import Any, Dict, Optional
 
 from torch import Tensor
 
+from . import LEARNER_REG
 from ..core import Learner
 
 
+@LEARNER_REG.register()
 class Supervised(Learner):
     """Generic supervised learning task."""
 

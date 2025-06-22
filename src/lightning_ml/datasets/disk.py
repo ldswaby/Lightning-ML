@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
+from . import DATASET_REG
 from .labelled import LabelledDataset
 from .unlabelled import UnlabelledDataset
 
@@ -20,6 +21,7 @@ __all__ = [
 ]
 
 
+@DATASET_REG.register()
 class NumpyUnlabelledDataset(UnlabelledDataset):
     """Unlabelled dataset backed by a NumPy array or ``.npy`` file."""
 
@@ -34,6 +36,7 @@ class NumpyUnlabelledDataset(UnlabelledDataset):
         super().__init__(inputs, transform=transform)
 
 
+@DATASET_REG.register()
 class NumpyLabelledDataset(LabelledDataset):
     """Labelled dataset backed by NumPy arrays or ``.npy`` files."""
 
@@ -57,6 +60,7 @@ class NumpyLabelledDataset(LabelledDataset):
         )
 
 
+@DATASET_REG.register()
 class CSVDataset(LabelledDataset):
     """Labelled dataset loaded from a CSV file."""
 
@@ -78,6 +82,7 @@ class CSVDataset(LabelledDataset):
         )
 
 
+@DATASET_REG.register()
 class ImageFolderDataset(LabelledDataset):
     """Simple image classification dataset from a folder structure."""
 

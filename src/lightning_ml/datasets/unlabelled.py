@@ -7,9 +7,11 @@ input and target sequences.
 
 from typing import Any, Callable, Optional, Sequence
 
+from . import DATASET_REG
 from .abstract import UnlabelledDatasetBase
 
 
+@DATASET_REG.register()
 class UnlabelledDataset(UnlabelledDatasetBase):
     """Generic labelled dataset with optional transforms.
 

@@ -7,11 +7,13 @@ from typing import Any, List, Optional, Sequence, Union
 
 from torch import Tensor
 
+from . import PREDICTOR_REG
 from ..core import Predictor
 
 __all__ = ["Classification"]
 
 
+@PREDICTOR_REG.register()
 class Classification(Predictor):
     """Predictor for classification tasks.
 
