@@ -6,11 +6,13 @@ from typing import Any, Dict, Optional, Callable
 
 from torch import Tensor
 
+from . import LEARNER_REG
 from ..core import Learner
 
 __all__ = ["SemiSupervised"]
 
 
+@LEARNER_REG.register()
 class SemiSupervised(Learner):
     """Generic semi-supervised learning task.
 

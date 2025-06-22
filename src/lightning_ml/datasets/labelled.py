@@ -7,11 +7,13 @@ input and target sequences.
 
 from typing import Any, Callable, Optional, Sequence
 
+from . import DATASET_REG
 from .abstract import LabelledDatasetBase
 
 __all__ = ["LabelledDataset"]
 
 
+@DATASET_REG.register()
 class LabelledDataset(LabelledDatasetBase):
     """Generic labelled dataset with optional transforms.
 

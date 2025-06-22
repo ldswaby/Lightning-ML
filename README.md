@@ -26,7 +26,8 @@ To define a learner, you have to define the code that pipes a batch to model out
 - **Prediction utilities** – `Predictor` objects convert raw model outputs into task-specific predictions (e.g. class indices).
 - **Dataset building blocks** – reusable dataset mix-ins and ready-to-use in-memory datasets for labelled, unlabelled and contrastive setups.
 - **Generic datamodule** – the `DataModule` can turn any dataset into Lightning data loaders with optional train/val/test splits.
-- **Model registry** – simple registry mechanism for declaring and retrieving models by name.
+- **Component registries** – simple registry mechanism for declaring and retrieving
+  datasets, learners, models and predictors by name.
 - **Project orchestration** – the `Project` class wires together a learner and a Lightning `Trainer` instance for a concise training loop.
 
 ## Repository layout
@@ -36,8 +37,8 @@ src/lightning_ml/
 ├── core/        # base classes: Learner, Predictor, Dataset, DataModule, Project
 ├── datasets/    # dataset mix-ins and concrete dataset implementations
 ├── learners/    # common learning paradigms (Supervised, Unsupervised, Contrastive, SemiSupervised)
-├── models/      # model registry and example model
-├── predictors/  # output post-processing utilities
+├── models/      # registered models and example implementation
+├── predictors/  # registered output post-processing utilities
 └── utils/       # helper functions (registries, class binding, ...)
 ```
 
