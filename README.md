@@ -28,6 +28,7 @@ To define a learner, you have to define the code that pipes a batch to model out
 - **Generic datamodule** – the `DataModule` can turn any dataset into Lightning data loaders with optional train/val/test splits.
 - **Component registries** – simple registry mechanism for declaring and retrieving
   datasets, learners, models and predictors by name.
+- **Torchvision integration** – utility functions to auto-register torchvision models and datasets.
 - **Project orchestration** – the `Project` class wires together a learner and a Lightning `Trainer` instance for a concise training loop.
 
 ## Repository layout
