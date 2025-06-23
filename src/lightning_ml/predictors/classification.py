@@ -7,8 +7,8 @@ from typing import Any, List, Optional, Sequence, Union
 
 from torch import Tensor
 
-from . import PREDICTOR_REG
 from ..core import Predictor
+from . import PREDICTOR_REG
 
 __all__ = ["Classification"]
 
@@ -20,28 +20,36 @@ class Classification(Predictor):
     Converts model outputs into class indices or string labels.
     """
 
+    valid_return_types = {"indices", "labels", "probs"}
+
     def __init__(
         self,
         softmax: bool = True,
         class_list: Optional[Sequence[str]] = None,
-        return_labels: bool = False,
+        default_return: str = "indices",
     ) -> None:
         """Initialize the Classification predictor.
 
         Args:
             softmax (bool): Whether to apply softmax to outputs before prediction.
             class_list (Optional[Sequence[str]]): List of labels for each class index.
-            return_labels (bool): If True, __call__ returns labels instead of indices by default.
+            default_return (str): Default return type. One of {"indices", "labels", "probs"}.
+                "labels" requires `class_list` to be specified.
         """
         self.softmax = softmax
         self.class_list = class_list
-        self.return_labels = return_labels
-        if self.return_labels and not class_list:
+        # Validate and store the default return type
+        if default_return not in self.valid_return_types:
+            raise ValueError(
+                f"`default_return` must be one of {self.valid_return_types}, got {default_return!r}"
+            )
+        if default_return == "labels" and not class_list:
             warnings.warn(
-                "`class_list` not provided; returning class indices instead",
+                "`class_list` not provided; falling back to class indices for default_return",
                 UserWarning,
             )
-            self.return_labels = False
+            default_return = "indices"
+        self.default_return = default_return
 
     def _map_labels(self, o: Union[int, List[Any]]) -> Union[str, List[str]]:
         """Recursively map class indices to labels.
@@ -57,37 +65,49 @@ class Classification(Predictor):
         return self.class_list[o]
 
     def __call__(
-        self, outputs: Tensor, *, return_labels: Optional[bool] = None
+        self,
+        outputs: Tensor,
+        *,
+        return_type: Optional[str] = None,
     ) -> Union[Tensor, List[str]]:
-        """Predict class indices or labels from model outputs.
+        """Predict class indices, labels, or probabilities from model outputs.
 
         Args:
             outputs (Tensor): Raw model outputs (logits or probabilities).
-            return_labels (Optional[bool]): Whether to return labels (True) or indices (False).
-                If None, uses the default set at initialization.
+            return_type (Optional[str]): Desired output type—one of {"indices", "labels", "probs"}.
+                If None, falls back to the default specified when the predictor was constructed
+                (`default_return`).
 
         Returns:
-            Union[Tensor, List[str]]: Class indices as a Tensor if labels are not requested,
+            Union[Tensor, List[str]]: Class indices as a Tensor, probabilities as a Tensor,
             or a nested list of class labels.
 
         Raises:
-            ValueError: If labels are requested but no class_list was provided.
+            ValueError: If an invalid return_type is provided.
         """
-        # Determine whether to return class indices or labels
-        if return_labels is None:
-            return_labels = self.return_labels
-        elif return_labels and not self.class_list:
+        desired = return_type if return_type is not None else self.default_return
+
+        if desired not in self.valid_return_types:
+            raise ValueError(
+                f"`return_type` must be one of {self.valid_return_types}, got {desired!r}"
+            )
+
+        # Handle label availability
+        if desired == "labels" and not self.class_list:
             warnings.warn(
                 "`class_list` not provided; returning class indices instead",
                 UserWarning,
             )
-            return_labels = False
+            desired = "indices"
 
         if self.softmax:
             outputs = outputs.softmax(dim=-1)
+            if desired == "probs":
+                return outputs
 
         class_idx = outputs.argmax(dim=-1)
-        if not return_labels:
+
+        if desired == "indices":
             return class_idx
 
-        return self._map_labels(class_idx.tolist())
+        return self._map_labels(class_idx.tolist())  # desired == "labels"

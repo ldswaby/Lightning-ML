@@ -3,7 +3,7 @@ from pytorch_lightning import Trainer
 from torch import Tensor, nn, optim
 from torchmetrics import Accuracy, F1Score, MetricCollection, Precision, Recall
 
-from src.lightning_ml.core import DataModule, Project
+from src.lightning_ml.core import DataModule, School
 from src.lightning_ml.datasets import (
     ContrastiveLabelledDataset,
     LabelledDataset,
@@ -45,7 +45,7 @@ metrics = {
     "test": classification_metrics.clone(prefix="test_"),
 }
 
-model = MyCustomModel(input_size=2, hidden_size=64, output_size=NUM_CLASSES)
+model = MyCustomModel(input_size=4, hidden_size=64, output_size=NUM_CLASSES)
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 criterion = nn.CrossEntropyLoss()
 
@@ -59,7 +59,9 @@ learner = Supervised(
     # predictor: Optional[Predictor] = None,
 )
 
-project = Project(learner=learner, trainer=Trainer())
+
+breakpoint()
+school = School(learner=learner, trainer=Trainer())
 
 
-project.train()
+school.train()
