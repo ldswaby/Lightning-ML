@@ -1,10 +1,5 @@
-from . import data, inspect
+from . import data, inspect, torchvision
 from .registry import Registry
-from .torchvision import (
-    register_torchvision,
-    register_torchvision_datasets,
-    register_torchvision_models,
-)
 from .utils import *
 
 __all__ = [

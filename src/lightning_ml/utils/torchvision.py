@@ -5,12 +5,17 @@ from typing import Optional
 
 from .registry import Registry
 
-__all__ = ["register_torchvision_models", "register_torchvision_datasets", "register_torchvision"]
+__all__ = [
+    "register_torchvision_models",
+    "register_torchvision_datasets",
+    "register_torchvision",
+]
 
 
 def _import_torchvision():
     try:
         import torchvision
+
         return torchvision
     except Exception as e:
         raise ImportError("torchvision is required for this functionality") from e
@@ -20,22 +25,22 @@ def register_torchvision_models(registry: Optional[Registry] = None) -> None:
     """Register all torchvision model functions and classes."""
     tv = _import_torchvision()
     from ..models import MODEL_REG  # local import to avoid circular dependency
+
     registry = registry or MODEL_REG
 
-    for name, obj in inspect.getmembers(tv.models):
-        if name.startswith("_"):
-            continue
-        if callable(obj):
-            try:
-                registry.register(name)(obj)
-            except KeyError:
-                pass
+    for name in tv.models.list_models():
+        fn = tv.models.get_model_builder(name)
+        try:
+            registry.register(name)(fn)
+        except KeyError:
+            pass
 
 
 def register_torchvision_datasets(registry: Optional[Registry] = None) -> None:
     """Register all torchvision dataset classes."""
     tv = _import_torchvision()
     from ..datasets import DATASET_REG
+
     registry = registry or DATASET_REG
 
     try:
