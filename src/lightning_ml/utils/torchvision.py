@@ -28,8 +28,17 @@ def register_torchvision_models(registry: Optional[Registry] = None) -> None:
 
     registry = registry or MODEL_REG
 
-    for name in tv.models.list_models():
-        fn = tv.models.get_model_builder(name)
+    if hasattr(tv.models, "list_models") and hasattr(tv.models, "get_model_builder"):
+        names = tv.models.list_models()
+        getters = {name: tv.models.get_model_builder(name) for name in names}
+    else:
+        getters = {
+            name: obj
+            for name, obj in inspect.getmembers(tv.models)
+            if not name.startswith("_") and (inspect.isfunction(obj) or inspect.isclass(obj))
+        }
+
+    for name, fn in getters.items():
         try:
             registry.register(name)(fn)
         except KeyError:

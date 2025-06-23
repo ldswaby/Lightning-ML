@@ -1,35 +1,60 @@
 import inspect
-from abc import ABC, abstractmethod
-from types import SimpleNamespace
-from typing import Any, Dict, Optional, Type
 
-import torch
+from typing import Any, Dict, Optional, Union
+
 from pytorch_lightning import LightningDataModule
 from sklearn.model_selection._split import BaseCrossValidator
 from torch.utils.data import DataLoader, Dataset, Subset
 
-from ..utils.inspect import get_class_parameters
-from .dataset import BaseDataset
 
 
-class DataModule(LightningDataModule, ABC):
+
+class DataModule(LightningDataModule):
     """
     A LightningDataModule that can wrap *any* BaseDataset subclass.
     """
 
     splits = {"train", "val", "test"}
 
-    def __init__(self, **dataloader_kwargs):
+    def __init__(
+        self,
+        dataset: Union[Dataset, Dict[str, Dataset], None] = None,
+        *,
+        splitter: Optional[BaseCrossValidator] = None,
+        **dataloader_kwargs,
+    ) -> None:
         super().__init__()
+        self.dataset = dataset
+        self.splitter = splitter
         self._dataloader_kwargs = dataloader_kwargs
-        self.datasets: Dict[str, BaseDataset] = {}
+        self.datasets: Dict[str, Dataset] = {}
+        if isinstance(dataset, dict):
+            self.datasets.update(dataset)
 
-    @abstractmethod
     def define_datasets(self) -> None:
-        """Create train/val/test ``Dataset`` objects and cache them on ``self.
-        datasets``.
-        """
-        raise NotImplementedError
+        """Populate ``self.datasets`` if not already provided."""
+        if isinstance(self.dataset, dict):
+            self.datasets.update(self.dataset)
+            return
+
+        if isinstance(self.dataset, Dataset) and self.splitter is not None:
+            y = getattr(self.dataset, "targets", None)
+            indices = range(len(self.dataset))
+            splits = next(self.splitter.split(indices, y))
+
+            if len(splits) == 2:
+                train_idx, test_idx = splits
+                val_idx = []
+            elif len(splits) == 3:
+                train_idx, val_idx, test_idx = splits
+            else:
+                raise ValueError("splitter must yield 2 or 3 index arrays")
+
+            self.datasets["train"] = Subset(self.dataset, train_idx)
+            if len(val_idx):
+                self.datasets["val"] = Subset(self.dataset, val_idx)
+            if len(test_idx):
+                self.datasets["test"] = Subset(self.dataset, test_idx)
 
     # def _logic(self, stage: str):
     #     """TODO: this is a placeholder function, but all data splitting logic should happen within define_Dataset
