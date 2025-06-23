@@ -7,7 +7,7 @@ from pytorch_lightning import LightningDataModule, Trainer
 from .learner import Learner
 
 
-class Project:
+class School:
     """Orchestrates a :class:`Learner` and a :class:`~pytorch_lightning.Trainer`."""
 
     def __init__(self, learner: Learner, trainer: Optional[Trainer] = None) -> None:

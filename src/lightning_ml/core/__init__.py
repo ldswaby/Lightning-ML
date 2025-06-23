@@ -6,6 +6,6 @@ from .datamodule import DataModule
 from .dataset import BaseDataset
 from .learner import Learner
 from .predictor import Predictor
-from .project import Project
+from .project import School
 
-__all__ = ["Learner", "Predictor", "Project", "BaseDataset", "DataModule"]
+__all__ = ["Learner", "Predictor", "School", "BaseDataset", "DataModule"]
