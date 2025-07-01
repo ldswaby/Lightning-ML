@@ -1,9 +1,8 @@
-from . import data, inspect, torchvision
+from . import inspect, torchvision
 from .registry import Registry
 from .utils import *
 
 __all__ = [
-    "data",
     "inspect",
     "Registry",
     "bind_classes",
