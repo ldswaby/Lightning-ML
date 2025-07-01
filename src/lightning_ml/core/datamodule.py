@@ -1,12 +1,9 @@
 import inspect
-
 from typing import Any, Dict, Optional, Union
 
 from pytorch_lightning import LightningDataModule
 from sklearn.model_selection._split import BaseCrossValidator
 from torch.utils.data import DataLoader, Dataset, Subset
-
-
 
 
 class DataModule(LightningDataModule):
@@ -39,8 +36,8 @@ class DataModule(LightningDataModule):
 
         if isinstance(self.dataset, Dataset) and self.splitter is not None:
             y = getattr(self.dataset, "targets", None)
-            indices = range(len(self.dataset))
-            splits = next(self.splitter.split(indices, y))
+            idxs = range(len(self.dataset))
+            splits = next(self.splitter.split(idxs, y))
 
             if len(splits) == 2:
                 train_idx, test_idx = splits
@@ -55,28 +52,6 @@ class DataModule(LightningDataModule):
                 self.datasets["val"] = Subset(self.dataset, val_idx)
             if len(test_idx):
                 self.datasets["test"] = Subset(self.dataset, test_idx)
-
-    # def _logic(self, stage: str):
-    #     """TODO: this is a placeholder function, but all data splitting logic should happen within define_Dataset
-
-    #     this logic can be defined
-    #     depending e.g. on which script is run (train/test).
-
-    #     Args:
-    #         stage (str): _description_
-    #     """
-    #     if stage == "fit":
-    #         # if dataset class has a `train` flag, invoke that = True, alng
-    #         # with other args
-    #         # e.g. mnist_full = MNIST(self.data_dir, train=True, transform=self.transform)
-    #         # if doens't have train flag...
-    #         pass
-    #     if stage == "test":
-    #         # train=True
-    #         pass
-    #     if stage == "predict":
-    #         # train=True
-    #         pass
 
     def setup(self, stage: Optional[str] = None) -> None:
         """Create train/val/test ``Dataset`` objects and cache them on ``self.
