@@ -31,6 +31,22 @@ To define a learner, you have to define the code that pipes a batch to model out
 - **Torchvision integration** – utility functions to auto-register torchvision models and datasets.
 - **Project orchestration** – the `Project` class wires together a learner and a Lightning `Trainer` instance for a concise training loop.
 
+## Data
+The two most common workflows with respect to splitting up data for machine learning are simple hold-out and cross-validation.
+
+I want my codebase to support both.
+
+### TODO:
+1. Starting point: load the dataset into a format compatible with my API. This may yield a single full `train` dataset or a `train` and a `test`.
+   1. If a single dataset, then `test` must be split off manually here.
+2. Pass the `train` dataset to a `utils.data.validation_split`  which will return a list of dicts: `[{"train": ..., "val": ...}, ...]` for the train+validation loop (that we will later iterate through). This enables standard holdout (e.g. `ShuffleSplit`) or CV (e.g. `KFold`)
+3. Run train + validation loop by iterating over the list from step 2 and aggregating results (see `sandbox2.py`)
+
+
+
+
+
+
 ## Repository layout
 
 ```

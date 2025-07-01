@@ -1,5 +1,6 @@
 import numpy as np
 from pytorch_lightning import Trainer
+from sklearn.model_selection import KFold, ShuffleSplit
 from torch import Tensor, nn, optim
 from torchmetrics import Accuracy, F1Score, MetricCollection, Precision, Recall
 
@@ -12,17 +13,14 @@ from src.lightning_ml.datasets import (
 )
 from src.lightning_ml.learners import Supervised
 from src.lightning_ml.models import MyCustomModel
+from src.lightning_ml.utils.data import validation_split
 
+trainset = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
+testset = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
 
-class NumpyDataModule(DataModule):
+shuffle_split = ShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
 
-    def define_datasets(self) -> None:
-        self.datasets["train"] = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
-        self.datasets["val"] = NumpyLabelledDataset("_data/X.npy", "_data/y.npy")
-        return
-
-
-data = NumpyDataModule()
+splits = validation_split(trainset, shuffle_split)
 
 
 NUM_CLASSES = 2
@@ -45,23 +43,20 @@ metrics = {
     "test": classification_metrics.clone(prefix="test_"),
 }
 
-model = MyCustomModel(input_size=4, hidden_size=64, output_size=NUM_CLASSES)
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
-criterion = nn.CrossEntropyLoss()
+for fold_idx, (trainset, valset) in enumerate(splits):
+    model = MyCustomModel(input_size=4, hidden_size=64, output_size=NUM_CLASSES)
+    optimizer = optim.Adam(model.parameters(), lr=1e-4)
+    criterion = nn.CrossEntropyLoss()
 
-learner = Supervised(
-    model=model,
-    optimizer=optimizer,
-    data_module=data,
-    criterion=criterion,
-    metrics=metrics,
-    # scheduler: Optional[_LRScheduler] = None,
-    # predictor: Optional[Predictor] = None,
-)
+    learner = Supervised(
+        model=model,
+        optimizer=optimizer,
+        # data_module=data,x
+        criterion=criterion,
+        metrics=metrics,
+        # scheduler: Optional[_LRScheduler] = None,
+        # predictor: Optional[Predictor] = None,
+    )
 
-
-breakpoint()
-school = School(learner=learner, trainer=Trainer())
-
-
-school.train()
+    school = School(learner=learner, trainer=Trainer())
+    school.train()
