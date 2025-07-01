@@ -10,6 +10,7 @@ from .abstract import *  # noqa: F401,F403
 from .contrastive import *  # noqa: F401,F403
 from .labelled import *  # noqa: F401,F403
 from .disk import *  # noqa: F401,F403
+from .torchvision_wrapper import *  # noqa: F401,F403
 
 __all__ = [
     "DATASET_REG",
@@ -22,4 +23,5 @@ __all__ = [
     "ContrastiveLabelledDataset",
     "ContrastiveUnlabelledDataset",
     "TripletDataset",
+    "TorchvisionDataset",
 ]
