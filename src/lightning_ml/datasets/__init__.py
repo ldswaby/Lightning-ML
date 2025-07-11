@@ -22,5 +22,5 @@ __all__ = [
     "ImageFolderDataset",
     "ContrastiveLabelledDataset",
     "ContrastiveUnlabelledDataset",
-    "TripletDataset"
+    "TripletDataset",
 ]

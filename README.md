@@ -1,5 +1,27 @@
 # Lightning-ML
 
+## TODO:
+* A given DataModule will
+  * mix (somehow) with
+    *  `Input` for custom loading from disk functionality (i.e. into inputs and, optionally, targets)
+    *  `Dataset` for the sample building behaviour (e.g. Labelled, Contrastive) -> inputs, targets, metadata etc
+* Have various factory methods
+* `Input` funcitons load sequences (for dataset _inputs) from various formats
+
+
+* Take the following from `lihgtning-flash`:
+  * `providers`
+  * `DataModule`
+  *
+
+
+
+```
+
+
+
+
+
 *NOTE*: This is a personal repository designed to serve as a quick-start framework for future machine learning (ML) projects.
 
 Built on top of [PyTorch Lightning](https://www.pytorchlightning.ai/), it provides modular libraries for all major components of the standard ML pipeline: datasets, models, loss functions, optimizers, and evaluation metrics. These are automatically piped together in a lightweight, easily configurable manner (either programmatically or through config files), enabling rapid development and deployment of ML projects from scratch.
@@ -37,6 +59,9 @@ The two most common workflows with respect to splitting up data for machine lear
 I want my codebase to support both.
 
 ### TODO:
+* Copy the dataset structure from `lightning-flash`
+
+
 1. Starting point: load the dataset into a format compatible with my API. This may yield a single full `train` dataset or a `train` and a `test`.
    1. If a single dataset, then `test` must be split off manually here.
 2. Pass the `train` dataset to a `utils.data.validation_split`  which will return a list of dicts: `[{"train": ..., "val": ...}, ...]` for the train+validation loop (that we will later iterate through). This enables standard holdout (e.g. `ShuffleSplit`) or CV (e.g. `KFold`)

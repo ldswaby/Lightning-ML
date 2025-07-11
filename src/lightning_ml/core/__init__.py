@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from .datamodule import DataModule
-from .dataset import BaseDataset
+# from .data.datamodule import DataModule
+from .data.dataset import BaseDataset
 from .learner import Learner
 from .predictor import Predictor
 from .school import School

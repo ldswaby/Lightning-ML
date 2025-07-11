@@ -44,6 +44,9 @@ class LabelledDataset(LabelledDatasetBase):
         if len(inputs) != len(targets):
             raise ValueError("inputs and targets must have the same length")
 
+        # TODO: create some kind of InputLoader (either arg or Mixin) that can load data here from various formats, e.g. Image, ImageFiles, ImageFolder
+        # The sole purpose of the inputs classes is to fetch different data types from disk and load them into Sequence[Any] for the attributes below
+
         self._inputs = inputs
         self._targets = targets
         self.transform = transform or (lambda x: x)
