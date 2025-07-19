@@ -28,8 +28,7 @@ import torch
 from torch.utils.data import Dataset
 
 from ..utils.enums import DataKeys
-from .properties import Properties
-from .target_formatter import TargetFormatter, get_target_formatter
+from .sample import Sample
 
 __all__ = [
     "BaseDataset",
@@ -121,7 +120,7 @@ class BaseDataset(Dataset, metaclass=DatasetMeta):
         Returns:
             Dict[str, torch.Tensor]: Mapping from each key in `sample_keys` to a tensor.
         """
-        return {k: getattr(self, f"get_{k}")(idx) for k in self.sample_keys}
+        return Sample(**{k: getattr(self, f"get_{k}")(idx) for k in self.sample_keys})
 
     def __init_subclass__(cls, **kwargs):
         """
@@ -203,59 +202,3 @@ class TripletDatasetBase(ContastiveDatasetBase, NegativeMixin):
 
     Combines mix-ins to enforce retrieval of input, positive, and negative samples.
     """
-
-
-# class ClassificationMixin(Properties):
-#     """The ``ClassificationInputMixin`` class provides utility methods for handling classification targets.
-#     :class:`~flash.core.data.io.input.Input` objects that extend ``ClassificationInputMixin`` should do the following:
-
-#     * In the ``load_data`` method, include a call to ``load_target_metadata``. This will determine the format of the
-#       targets and store metadata like ``labels`` and ``num_classes``.
-#     * In the ``load_sample`` method, use ``format_target`` to convert the target to a standard format for use with our
-#       tasks.
-
-#     """
-
-#     target_formatter: TargetFormatter
-#     multi_label: bool
-#     labels: list
-#     num_classes: int
-
-#     def load_target_metadata(
-#         self,
-#         targets: Optional[List[Any]],
-#         target_formatter: Optional[TargetFormatter] = None,
-#         add_background: bool = False,
-#     ) -> None:
-#         """Determine the target format and store the ``labels`` and ``num_classes``.
-
-#         Args:
-#             targets: The list of targets.
-#             target_formatter: Optionally provide a :class:`~flash.core.data.utilities.classification.TargetFormatter`
-#                 rather than inferring from the targets.
-#             add_background: If ``True``, a background class will be inserted as class zero if ``labels`` and
-#                 ``num_classes`` are being inferred.
-
-#         """
-#         self.target_formatter = target_formatter
-#         if target_formatter is None and targets is not None:
-#             self.target_formatter = get_target_formatter(
-#                 targets, add_background=add_background
-#             )
-
-#         if self.target_formatter is not None:
-#             self.multi_label = self.target_formatter.multi_label
-#             self.labels = self.target_formatter.labels
-#             self.num_classes = self.target_formatter.num_classes
-
-#     def format_target(self, target: Any) -> Any:
-#         """Format a single target according to the previously computed target format and metadata.
-
-#         Args:
-#             target: The target to format.
-
-#         Returns:
-#             The formatted target.
-
-#         """
-#         return getattr(self, "target_formatter", lambda x: x)(target)

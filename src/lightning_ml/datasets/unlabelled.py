@@ -10,6 +10,8 @@ from typing import Any, Callable, Optional, Sequence
 from . import DATASET_REG
 from .abstract import UnlabelledDatasetBase
 
+__all__ = ["UnlabelledDataset"]
+
 
 @DATASET_REG.register()
 class UnlabelledDataset(UnlabelledDatasetBase):

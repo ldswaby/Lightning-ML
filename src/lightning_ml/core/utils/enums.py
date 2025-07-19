@@ -5,10 +5,10 @@ class DataKeys(LightningEnum):
     """The ``DataKeys`` enum contains the keys that are used by built-in data sources to refer to inputs and targets."""
 
     INPUT = "input"
-    PREDS = "preds"
     TARGET = "target"
     POSITIVE = "positive"
     NEGATIVE = "negative"
+    PREDS = "prediction"
     METADATA = "metadata"
 
     def __hash__(self) -> int:

@@ -36,7 +36,7 @@ class DataModule(pl.LightningDataModule):
         test_split: Optional[float] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
-        **dataloader_kwargs,
+        dataloader_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
 
@@ -106,3 +106,9 @@ class DataModule(pl.LightningDataModule):
     def from_config(cls, cfg: dict) -> "DataModule":
         # TODO
         raise NotImplementedError
+
+
+# class ObjectDetectionDataModule(DataModule):
+
+#     @classmethod
+#     def from_folder(cls, folder)

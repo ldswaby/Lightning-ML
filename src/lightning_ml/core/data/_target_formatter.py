@@ -8,6 +8,8 @@ class TargetFormatter(ABC):
     """A ``TargetFormatter`` is used to convert targets of a given type to a standard format required by the loss
     function. To implement a custom ``TargetFormatter``, simply override the ``format`` method with your own logic.
 
+    NOTE: this should be passed to Labelled dataset as target transform
+
     Examples
     ________
 
