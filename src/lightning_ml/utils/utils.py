@@ -11,7 +11,7 @@ OutT = TypeVar("OutT", bound=type)
 __all__ = ["bind_classes"]
 
 
-def bind_classes(base_cls: Type[BaseT], mixin_cls: Type[MixinT], name: str | None = None) -> Type[OutT]:
+def bind_classes(base_cls: type[BaseT], mixin_cls: type[MixinT], name: str | None = None) -> type[OutT]:
     """Create a new class combining ``mixin_cls`` and ``base_cls``.
 
     Parameters

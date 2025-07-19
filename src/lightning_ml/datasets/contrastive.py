@@ -8,7 +8,8 @@ This module provides:
 """
 
 import random
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Optional
+from collections.abc import Callable, Sequence
 
 from . import DATASET_REG
 from .abstract import ContastiveDatasetBase, TripletDatasetBase
@@ -38,8 +39,8 @@ class ContrastiveLabelledDataset(LabelledDataset, ContastiveDatasetBase):
         inputs: Sequence[Any],
         targets: Sequence[Any],
         *,
-        transform: Optional[Callable[[Any], Any]] = None,
-        target_transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Any], Any] | None = None,
+        target_transform: Callable[[Any], Any] | None = None,
     ) -> None:
         """
         Initialize the contrastive-labelled dataset.
@@ -93,7 +94,7 @@ class ContrastiveUnlabelledDataset(UnlabelledDataset, ContastiveDatasetBase):
     def __init__(
         self,
         inputs: Sequence[Any],
-        transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Any], Any] | None = None,
     ) -> None:
         """
         Initialize the unlabelled contrastive dataset.

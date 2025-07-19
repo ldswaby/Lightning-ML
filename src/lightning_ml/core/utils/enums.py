@@ -1,4 +1,7 @@
-from pytorch_lightning.utilities.enums import LightningEnum
+try:  # pragma: no cover - optional dependency
+    from pytorch_lightning.utilities.enums import LightningEnum
+except Exception:  # pragma: no cover - fallback when PL not installed
+    from enum import Enum as LightningEnum
 
 
 class DataKeys(LightningEnum):

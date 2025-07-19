@@ -5,7 +5,8 @@ training logic, metric computation, and prediction post-processing.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict, Optional
+from collections.abc import Callable
 
 import pytorch_lightning as pl
 from torch import Tensor, nn
@@ -29,11 +30,11 @@ class Learner(pl.LightningModule, ABC):
         model: nn.Module,
         optimizer: Optimizer,
         *,
-        data_module: Optional[pl.LightningDataModule] = None,
-        criterion: Optional[Callable[[Any, Any], Tensor] | nn.Module] = None,
-        metrics: Optional[Dict[str, MetricCollection]] = None,
-        scheduler: Optional[_LRScheduler] = None,
-        predictor: Optional[Predictor | Callable[[Tensor], Any]] = None,
+        data_module: pl.LightningDataModule | None = None,
+        criterion: Callable[[Any, Any], Tensor] | nn.Module | None = None,
+        metrics: dict[str, MetricCollection] | None = None,
+        scheduler: _LRScheduler | None = None,
+        predictor: Predictor | Callable[[Tensor], Any] | None = None,
     ) -> None:
         """Initialize the Learner.
 
@@ -60,14 +61,14 @@ class Learner(pl.LightningModule, ABC):
         self.predictor = predictor  # fallback to identity fn
 
     @abstractmethod
-    def batch_forward(self, batch: Dict[str, Any]) -> Any:
+    def batch_forward(self, batch: dict[str, Any]) -> Any:
         """Extract inputs from ``batch`` and runs through model.
 
         `Outputs for this function go directly in self.compute_loss`
         """
 
     @abstractmethod
-    def compute_loss(self, model_outputs: Any, targets: Optional[Any] = None) -> Tensor:
+    def compute_loss(self, model_outputs: Any, targets: Any | None = None) -> Tensor:
         """Compute loss from model outputs and targets.
 
         Args:
@@ -95,7 +96,7 @@ class Learner(pl.LightningModule, ABC):
         """Forward hook"""
         return self.model(*args, **kwargs)
 
-    def step(self, batch: Any, stage: str) -> Dict[str, Tensor]:
+    def step(self, batch: Any, stage: str) -> dict[str, Tensor]:
         """Run a single step for a given stage.
 
         Args:
