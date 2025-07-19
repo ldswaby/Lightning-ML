@@ -7,7 +7,8 @@ import importlib
 import inspect
 from dataclasses import fields, is_dataclass
 from types import ModuleType
-from typing import Any, Callable, List, Type, Union
+from typing import Any, List, Type, Union
+from collections.abc import Callable
 
 __all__ = [
     "get_parent_classes",
@@ -23,7 +24,7 @@ __all__ = [
 
 
 # Private helper to DRY module loading
-def _load_module(module: Union[str, ModuleType]) -> ModuleType:
+def _load_module(module: str | ModuleType) -> ModuleType:
     """
     Load and return a module object from a module name or return if already a module.
     """
@@ -35,10 +36,10 @@ def _load_module(module: Union[str, ModuleType]) -> ModuleType:
 
 
 def get_parent_classes(
-    target: Union[Type[Any], Any],
-    module: Union[str, ModuleType],
+    target: type[Any] | Any,
+    module: str | ModuleType,
     recursive: bool = True,
-) -> List[Type[Any]]:
+) -> list[type[Any]]:
     """
     Return all base classes of `target` (a class or instance) that are defined in `module`.
 
@@ -69,8 +70,8 @@ def get_parent_classes(
 
 
 def get_child_classes(
-    base: Type[Any], module: Union[str, ModuleType]
-) -> List[Type[Any]]:
+    base: type[Any], module: str | ModuleType
+) -> list[type[Any]]:
     """
     Return all subclasses of `base` defined in `module`, excluding the base itself.
 
@@ -90,7 +91,7 @@ def get_child_classes(
     return subclasses
 
 
-def get_module_functions(module: Union[str, ModuleType]) -> List[Callable]:
+def get_module_functions(module: str | ModuleType) -> list[Callable]:
     """
     Return all top-level functions defined in `module`.
 
@@ -146,7 +147,7 @@ def get_summary(obj: Any) -> str:
     return doc.strip().split("\n", 1)[0]
 
 
-def ensure_has_attributes(obj: Any, attrs: List[str]) -> None:
+def ensure_has_attributes(obj: Any, attrs: list[str]) -> None:
     """
     Raise AttributeError if `obj` is missing any of the specified attribute names.
     """
@@ -155,7 +156,7 @@ def ensure_has_attributes(obj: Any, attrs: List[str]) -> None:
         raise AttributeError(f"{obj!r} is missing attributes: {missing}")
 
 
-def get_dataclass_fields(obj: Any) -> List[str]:
+def get_dataclass_fields(obj: Any) -> list[str]:
     """
     If `obj` is a dataclass or instance thereof, return its field names.
 
@@ -168,7 +169,7 @@ def get_dataclass_fields(obj: Any) -> List[str]:
     raise TypeError(f"{cls.__name__} is not a dataclass")
 
 
-def get_class_parameters(obj: Any) -> List[str]:
+def get_class_parameters(obj: Any) -> list[str]:
     """
     If `obj` is a class or instance thereof, return its parameter names.
     """

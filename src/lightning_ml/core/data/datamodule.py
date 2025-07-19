@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Dict, Optional, Type
+from collections.abc import Callable
 
 import pytorch_lightning as pl
 from sklearn.model_selection._split import BaseCrossValidator
@@ -28,14 +29,14 @@ class DataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        train_data: Optional[BaseDataset],
-        val_data: Optional[BaseDataset] = None,
-        test_data: Optional[BaseDataset] = None,
-        predict_data: Optional[BaseDataset] = None,
-        val_split: Optional[float] = None,
-        test_split: Optional[float] = None,
-        transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None,
+        train_data: BaseDataset | None,
+        val_data: BaseDataset | None = None,
+        test_data: BaseDataset | None = None,
+        predict_data: BaseDataset | None = None,
+        val_split: float | None = None,
+        test_split: float | None = None,
+        transform: Callable | None = None,
+        target_transform: Callable | None = None,
         **dataloader_kwargs,
     ) -> None:
         super().__init__()
@@ -72,37 +73,37 @@ class DataModule(pl.LightningDataModule):
         self.dataloader_kwargs = dataloader_kwargs
 
     @property
-    def train_dataset(self) -> Optional[BaseDataset]:
+    def train_dataset(self) -> BaseDataset | None:
         """This property returns the train dataset."""
         return self._train_data
 
     @property
-    def val_dataset(self) -> Optional[BaseDataset]:
+    def val_dataset(self) -> BaseDataset | None:
         """This property returns the validation dataset."""
         return self._val_data
 
     @property
-    def test_dataset(self) -> Optional[BaseDataset]:
+    def test_dataset(self) -> BaseDataset | None:
         """This property returns the test dataset."""
         return self._test_data
 
     @property
-    def predict_dataset(self) -> Optional[BaseDataset]:
+    def predict_dataset(self) -> BaseDataset | None:
         """This property returns the prediction dataset."""
         return self._predict_data
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(self.train_dataset, shuffle=True, **self.dataloader_kwargs)
 
-    def val_dataloader(self) -> Optional[DataLoader]:
+    def val_dataloader(self) -> DataLoader | None:
         if self.val_dataset is not None:
             return DataLoader(self.val_dataset, **self.dataloader_kwargs)
 
-    def test_dataloader(self) -> Optional[DataLoader]:
+    def test_dataloader(self) -> DataLoader | None:
         if self.test_dataset is not None:
             return DataLoader(self.test_dataset, **self.dataloader_kwargs)
 
     @classmethod
-    def from_config(cls, cfg: dict) -> "DataModule":
+    def from_config(cls, cfg: dict) -> DataModule:
         # TODO
         raise NotImplementedError

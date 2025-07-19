@@ -5,7 +5,8 @@ This module provides a function to convert sklearn cross-validation splits
 into torch.utils.data.Subset objects for train and validation.
 """
 
-from typing import Dict, Iterator
+from typing import Dict
+from collections.abc import Iterator
 
 from sklearn.model_selection._split import BaseCrossValidator
 from torch.utils.data import Subset
@@ -15,7 +16,7 @@ from ..core import BaseDataset
 
 def validation_split(
     dataset: BaseDataset, cv: BaseCrossValidator
-) -> Iterator[Dict[str, Subset]]:
+) -> Iterator[dict[str, Subset]]:
     """Split a PyTorch Dataset into train and validation subsets.
 
     TODO: make support groups?

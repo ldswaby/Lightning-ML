@@ -5,7 +5,8 @@ This module provides a simple in-memory labeled dataset that stores
 input and target sequences.
 """
 
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Optional
+from collections.abc import Callable, Sequence
 
 from . import DATASET_REG
 from .abstract import LabelledDatasetBase
@@ -38,8 +39,8 @@ class LabelledDataset(LabelledDatasetBase):
         inputs: Sequence[Any],
         targets: Sequence[Any],
         *,
-        transform: Optional[Callable[[Any], Any]] = None,
-        target_transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Any], Any] | None = None,
+        target_transform: Callable[[Any], Any] | None = None,
     ) -> None:
         if len(inputs) != len(targets):
             raise ValueError("inputs and targets must have the same length")

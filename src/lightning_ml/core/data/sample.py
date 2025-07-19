@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Optional
+from collections.abc import Sequence
 
 from ..utils.enums import DataKeys
 
@@ -26,11 +27,11 @@ class Sample:  # noqa: D101
     """
 
     input: Any
-    preds: Optional[Any] = None
-    target: Optional[Any] = None
-    positive: Optional[Any] = None
-    negative: Optional[Any] = None
-    metadata: Optional[Dict[str, Any]] = field(default_factory=dict)
+    preds: Any | None = None
+    target: Any | None = None
+    positive: Any | None = None
+    negative: Any | None = None
+    metadata: dict[str, Any] | None = field(default_factory=dict)
 
     def __getitem__(self, key: str | DataKeys) -> Any:
         if isinstance(key, str):
@@ -55,7 +56,7 @@ class Sample:  # noqa: D101
             return list(DataKeys)
         return [k for k in DataKeys if getattr(self, k.value) is not None]
 
-    def to_dict(self, include_none: bool = False) -> Dict[str, Any]:
+    def to_dict(self, include_none: bool = False) -> dict[str, Any]:
         """Return a plain ``dict`` representation of the sample.
 
         Args:

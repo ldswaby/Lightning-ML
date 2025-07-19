@@ -77,7 +77,7 @@ PATH_TYPE = Union[str, bytes, os.PathLike]
 
 
 def has_file_allowed_extension(
-    filename: PATH_TYPE, extensions: Tuple[str, ...]
+    filename: PATH_TYPE, extensions: tuple[str, ...]
 ) -> bool:
     """Checks if a file is an allowed extension.
 
@@ -307,7 +307,7 @@ def escape_url(url: str) -> str:
     return f"{parsed.scheme}://{parsed.netloc}{quote(parsed.path)}?{urlencode(parse_qs(parsed.query), doseq=True)}"
 
 
-def escape_file_path(file_path: Union[str, PathLike]) -> str:
+def escape_file_path(file_path: str | PathLike) -> str:
     """Escape a file system path or URL for fsspec opening.
 
     Uses glob.escape for local paths and escape_url for remote URLs.

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Callable
+from typing import Any, Dict, Optional
+from collections.abc import Callable
 
 from torch import Tensor
 
@@ -32,11 +33,11 @@ class SemiSupervised(Learner):
         self.unsupervised_criterion = unsupervised_criterion
         self.lambda_u = lambda_u
 
-    def batch_forward(self, batch: Dict[str, Any]) -> Any:
+    def batch_forward(self, batch: dict[str, Any]) -> Any:
         """Forward hook to underlying model ``self.model``"""
         return self.model(batch["input"])
 
-    def compute_loss(self, model_outputs: Any, targets: Optional[Any] = None) -> Tensor:
+    def compute_loss(self, model_outputs: Any, targets: Any | None = None) -> Tensor:
         """Compute weighted semi-supervised loss."""
         loss_u = self.unsupervised_criterion(model_outputs)
         loss_s = self.criterion(model_outputs, targets) if targets is not None else 0

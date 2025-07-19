@@ -1,5 +1,6 @@
 from glob import glob
-from typing import Any, Callable, Dict, Sequence
+from typing import Any, Dict
+from collections.abc import Callable, Sequence
 
 from lightning_ml.core.data.dataset import BaseDataset
 from lightning_ml.datasets.labelled import LabelledDataset
@@ -11,7 +12,7 @@ from ..core.utils.loading import load_image
 
 class Image(DType):
 
-    def process_sample(self, sample: Dict[str, Any]) -> Dict[str, Any]:
+    def process_sample(self, sample: dict[str, Any]) -> dict[str, Any]:
         """Add img metadata
 
         Args:

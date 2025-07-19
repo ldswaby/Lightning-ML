@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Union
+from collections.abc import Sequence
 
 from torch import Tensor
 
@@ -25,7 +26,7 @@ class Classification(Predictor):
     def __init__(
         self,
         softmax: bool = True,
-        class_list: Optional[Sequence[str]] = None,
+        class_list: Sequence[str] | None = None,
         default_return: str = "indices",
     ) -> None:
         """Initialize the Classification predictor.
@@ -51,7 +52,7 @@ class Classification(Predictor):
             default_return = "indices"
         self.default_return = default_return
 
-    def _map_labels(self, o: Union[int, List[Any]]) -> Union[str, List[str]]:
+    def _map_labels(self, o: int | list[Any]) -> str | list[str]:
         """Recursively map class indices to labels.
 
         Args:
@@ -68,8 +69,8 @@ class Classification(Predictor):
         self,
         outputs: Tensor,
         *,
-        return_type: Optional[str] = None,
-    ) -> Union[Tensor, List[str]]:
+        return_type: str | None = None,
+    ) -> Tensor | list[str]:
         """Predict class indices, labels, or probabilities from model outputs.
 
         Args:

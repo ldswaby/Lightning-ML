@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List
+from collections.abc import Sequence
 
 from lightning_ml.core.data.dataset import BaseDataset, LabelledDatasetBase, TargetMixin
 
@@ -19,7 +20,7 @@ class DType(ABC):
             Sequence[Any]: _description_
         """
 
-    def process_sample(self, sample: Dict[str, Any]) -> Dict[str, Any]:
+    def process_sample(self, sample: dict[str, Any]) -> dict[str, Any]:
         """Process sample (e.g. add metadata)
 
         Returns:
@@ -44,7 +45,7 @@ class YOLOFolder(LabelledDatasetBase):
         # load file and return raw here
         pass
 
-    def get_target(self, idx) -> Dict[str, Any]:
+    def get_target(self, idx) -> dict[str, Any]:
         """Process sample (e.g. add metadata)
 
         Returns:
@@ -56,7 +57,7 @@ class YOLOFolder(LabelledDatasetBase):
 class Target(TargetMixin):
     """Base class for target dicts (e.g. {bboxes.., labels...})"""
 
-    sample_keys: List[str] = []
+    sample_keys: list[str] = []
 
     def get_target(self, idx):
         return {k: getattr(self, f"get_{k}")(idx) for k in self.sample_keys}

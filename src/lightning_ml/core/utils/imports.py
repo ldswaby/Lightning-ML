@@ -164,7 +164,7 @@ _EXTRAS_AVAILABLE = {
 }
 
 
-def requires(*module_paths: Union[str, Tuple[bool, str]]):
+def requires(*module_paths: str | tuple[bool, str]):
     """Decorator factory to enforce optional dependencies.
 
     Checks that specified modules or extras are available before allowing
@@ -219,5 +219,5 @@ def requires(*module_paths: Union[str, Tuple[bool, str]]):
     return decorator
 
 
-def example_requires(module_paths: Union[str, List[str]]):
+def example_requires(module_paths: str | list[str]):
     return requires(module_paths)(lambda: None)()

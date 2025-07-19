@@ -10,7 +10,7 @@ from .learner import Learner
 class School:
     """Orchestrates a :class:`Learner` and a :class:`~pytorch_lightning.Trainer`."""
 
-    def __init__(self, learner: Learner, trainer: Optional[Trainer] = None) -> None:
+    def __init__(self, learner: Learner, trainer: Trainer | None = None) -> None:
         """Create a new project.
 
         Parameters
@@ -26,7 +26,7 @@ class School:
 
     # ------------------------------------------------------------------
     @property
-    def data(self) -> Optional[LightningDataModule]:
+    def data(self) -> LightningDataModule | None:
         """Convenience access to the learner's data_module."""
         return self.learner.data_module
 
