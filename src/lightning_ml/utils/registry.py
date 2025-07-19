@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Callable, List, Optional, TypeVar
+from typing import List, Optional, TypeVar
+from collections.abc import Callable
 
 T = TypeVar("T")
 
@@ -22,7 +23,7 @@ class Registry(dict):
         self._lib = lib
 
     # ------------------------------------------------------------------
-    def register(self, name: Optional[str] = None) -> Callable[[T], T]:
+    def register(self, name: str | None = None) -> Callable[[T], T]:
         """Decorator used to register ``cls`` under ``name``."""
 
         def decorator(cls: T) -> T:
@@ -41,7 +42,7 @@ class Registry(dict):
             raise KeyError(f"{self._lib} '{name}' not found in registry")
         return super().__getitem__(name)
 
-    def list_keys(self) -> List[str]:  # pragma: no cover - trivial
+    def list_keys(self) -> list[str]:  # pragma: no cover - trivial
         """Return a list of registered names."""
         return list(self.keys())
 

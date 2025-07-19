@@ -21,7 +21,7 @@ def _import_torchvision():
         raise ImportError("torchvision is required for this functionality") from e
 
 
-def register_torchvision_models(registry: Optional[Registry] = None) -> None:
+def register_torchvision_models(registry: Registry | None = None) -> None:
     """Register all torchvision model functions and classes."""
     tv = _import_torchvision()
     from ..models import MODEL_REG  # local import to avoid circular dependency
@@ -45,7 +45,7 @@ def register_torchvision_models(registry: Optional[Registry] = None) -> None:
             pass
 
 
-def register_torchvision_datasets(registry: Optional[Registry] = None) -> None:
+def register_torchvision_datasets(registry: Registry | None = None) -> None:
     """Register all torchvision dataset classes."""
     tv = _import_torchvision()
     from ..datasets import DATASET_REG

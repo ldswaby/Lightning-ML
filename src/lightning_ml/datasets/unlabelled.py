@@ -5,7 +5,8 @@ This module provides a simple in-memory labeled dataset that stores
 input and target sequences.
 """
 
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Optional
+from collections.abc import Callable, Sequence
 
 from . import DATASET_REG
 from .abstract import UnlabelledDatasetBase
@@ -37,7 +38,7 @@ class UnlabelledDataset(UnlabelledDatasetBase):
         self,
         inputs: Sequence[Any],
         *,
-        transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Any], Any] | None = None,
     ) -> None:
         self._inputs = inputs
         self.transform = transform or (lambda x: x)

@@ -14,13 +14,13 @@ __all__ = ["Contrastive"]
 class Contrastive(Learner):
     """Contrastive learning task. Supports both supervised and unsupervised."""
 
-    def batch_forward(self, batch: Dict[str, Any]) -> Any:
+    def batch_forward(self, batch: dict[str, Any]) -> Any:
         """Forward hook to underlying model `self.model`"""
         z1 = self.model(batch["input"])
         z2 = self.model(batch["positive"])
         return z1, z2
 
-    def compute_loss(self, model_outputs: Any, targets: Optional[Any] = None) -> Tensor:
+    def compute_loss(self, model_outputs: Any, targets: Any | None = None) -> Tensor:
         """Compute loss given raw ``model_outputs`` and ``targets``.
 
         Assumes loss fn takes input_embedding, positive_emedding, (label)

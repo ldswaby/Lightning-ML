@@ -6,7 +6,8 @@ This module provides:
 - UnlabelledDatasetBase, LabelledDatasetBase, ContastiveDatasetBase, TripletDatasetBase: abstract dataset base classes combining mix-ins.
 """
 
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 from ..core import BaseDataset
 

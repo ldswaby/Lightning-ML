@@ -54,7 +54,7 @@ class DatasetMeta(ABCMeta):
     """
 
     def __new__(
-        mcls, name: str, bases: Tuple[type, ...], namespace: Dict[str, Any]
+        mcls, name: str, bases: tuple[type, ...], namespace: dict[str, Any]
     ) -> "DatasetMeta":
         """
         Construct a new class, injecting abstractmethod stubs.
@@ -68,12 +68,12 @@ class DatasetMeta(ABCMeta):
             AutoAbstractMeta: The newly created class with injected stubs.
         """
         # Determine declared and inherited sample_keys, then form their union
-        declared_keys: List[str] = namespace.get("sample_keys", [])
-        inherited_keys: List[str] = []
+        declared_keys: list[str] = namespace.get("sample_keys", [])
+        inherited_keys: list[str] = []
         for base in bases:
             inherited_keys.extend(getattr(base, "sample_keys", []))
         # Combine inherited and declared, preserving order and uniqueness
-        keys_list: List[str] = []
+        keys_list: list[str] = []
         for k in inherited_keys + declared_keys:
             if k not in keys_list:
                 keys_list.append(k)
@@ -108,9 +108,9 @@ class BaseDataset(Dataset, metaclass=DatasetMeta):
         sample_keys (List[str]): Keys defining each component returned by __getitem__.
     """
 
-    sample_keys: List[str] = []
+    sample_keys: list[str] = []
 
-    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         """
         Retrieve a sample by index.
 

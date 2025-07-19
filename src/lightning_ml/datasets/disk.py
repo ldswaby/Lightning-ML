@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Optional
+from collections.abc import Callable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -29,7 +30,7 @@ class NumpyUnlabelledDataset(UnlabelledDataset):
         self,
         inputs: str | Sequence[Any] | np.ndarray,
         *,
-        transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Any], Any] | None = None,
     ) -> None:
         if isinstance(inputs, str):
             inputs = np.load(inputs)
@@ -45,8 +46,8 @@ class NumpyLabelledDataset(LabelledDataset):
         inputs: str | Sequence[Any] | np.ndarray,
         targets: str | Sequence[Any] | np.ndarray,
         *,
-        transform: Optional[Callable[[Any], Any]] = None,
-        target_transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Any], Any] | None = None,
+        target_transform: Callable[[Any], Any] | None = None,
     ) -> None:
         if isinstance(inputs, str):
             inputs = np.load(inputs)
@@ -70,9 +71,9 @@ class CSVDataset(LabelledDataset):
         input_cols: Sequence[str],
         target_col: str,
         *,
-        transform: Optional[Callable[[Any], Any]] = None,
-        target_transform: Optional[Callable[[Any], Any]] = None,
-        pandas_kwargs: Optional[dict] = None,
+        transform: Callable[[Any], Any] | None = None,
+        target_transform: Callable[[Any], Any] | None = None,
+        pandas_kwargs: dict | None = None,
     ) -> None:
         df = pd.read_csv(csv_path, **(pandas_kwargs or {}))
         inputs = df[input_cols].values
@@ -90,8 +91,8 @@ class ImageFolderDataset(LabelledDataset):
         self,
         root: str,
         *,
-        transform: Optional[Callable[[Image.Image], Any]] = None,
-        target_transform: Optional[Callable[[Any], Any]] = None,
+        transform: Callable[[Image.Image], Any] | None = None,
+        target_transform: Callable[[Any], Any] | None = None,
         image_extensions: Sequence[str] | None = None,
     ) -> None:
         self.root = root

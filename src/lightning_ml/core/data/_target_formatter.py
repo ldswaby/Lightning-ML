@@ -32,11 +32,11 @@ class TargetFormatter(ABC):
 
     """
 
-    multi_label: ClassVar[Optional[bool]] = None
-    numeric: ClassVar[Optional[bool]] = None
-    binary: ClassVar[Optional[bool]] = None
-    labels: Optional[List[str]] = None
-    num_classes: Optional[int] = None
+    multi_label: ClassVar[bool | None] = None
+    numeric: ClassVar[bool | None] = None
+    binary: ClassVar[bool | None] = None
+    labels: list[str] | None = None
+    num_classes: int | None = None
 
     def __post_init__(self):
         self.num_classes = (

@@ -26,7 +26,7 @@ class TorchvisionDataset(LabelledDatasetBase):
     dataset: TorchDataset
 
     def __init__(
-        self, dataset: TorchDataset | Type[TorchDataset], **kwargs: Any
+        self, dataset: TorchDataset | type[TorchDataset], **kwargs: Any
     ) -> None:
         """Initializes the TorchvisionDataset.
 
