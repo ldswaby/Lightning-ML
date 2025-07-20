@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 from lightning_ml.core.data.dataset import BaseDataset
 from lightning_ml.data.datasets import LabelledDataset, UnlabelledDataset
@@ -16,17 +16,14 @@ class BaseLoader(ABC):
     def load_inputs(self) -> Sequence[Any]:
         """Fetch input(s)"""
 
-    def load_targets(self) -> Optional[Sequence[Any]]:
+    def load_targets(self) -> Sequence[Any] | None:
         """Return target(s), if present"""
-
-    # @abstractmethod
-    # def fetch_samples(self) -> tuple[Sequence[Any], Optional[Sequence[Any]]]:
-    #     """Fetch input(s) and (optionally) targets"""
+        return None
 
     def as_dataset(
         self,
         *,
-        dataset_cls: Optional[BaseDataset] = None,
+        dataset_cls: BaseDataset | None = None,
         **dataset_kwargs,
     ):
         """_summary_
@@ -37,7 +34,8 @@ class BaseLoader(ABC):
         Returns:
             _type_: _description_
         """
-        inputs, targets = self.fetch_samples()
+        inputs = self.load_inputs()
+        targets = self.load_targets()
 
         args = [inputs]
         if targets is None:

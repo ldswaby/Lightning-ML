@@ -14,7 +14,7 @@ from ...loaders import ImageFolder
 class ImageClassificationFolder(ImageFolder):
     """Loads all images from specified folder"""
 
-    def __init__(self, root: str, recursive: bool = False):
+    def __init__(self, root: str):
         """Initialize the ImageFolder loader.
 
         Args:
@@ -22,7 +22,7 @@ class ImageClassificationFolder(ImageFolder):
         """
         super().__init__(
             root=root,
-            recursive=recursive,
+            recursive=True,
             load_targets=self.subdirs_as_classes,
         )
 

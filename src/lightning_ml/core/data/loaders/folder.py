@@ -76,6 +76,7 @@ class Folder(BaseLoader):
                 for fname in filenames
             )
         else:
+            # Return only valid files in root
             iterator = (entry for entry in directory.iterdir() if entry.is_file())
 
         return [p for p in iterator if self.is_valid_file(str(p))]
@@ -85,6 +86,11 @@ class Folder(BaseLoader):
         return [self.file_loader(p) for p in paths]
 
     def load_targets(self) -> Sequence[Any] | None:
+        """NOTE defaults to return None
+
+        Returns:
+            Sequence[Any] | None: _description_
+        """
         return self._load_targets(self.root)
 
     # def fetch_samples(self) -> tuple[Sequence[Any], Sequence[Any] | None]:
