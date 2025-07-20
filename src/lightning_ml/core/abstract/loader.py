@@ -6,7 +6,10 @@ from typing import Any, Sequence
 
 from lightning_ml.core.data.dataset import BaseDataset
 
-from .datasets import LabelledDataset, UnlabelledDataset
+# Dataset implementations live in the data package but `BaseLoader` is located
+# under ``core.abstract``. Import directly from the public data package to avoid
+# circular dependencies and to keep this module self contained.
+from lightning_ml.core.data.datasets import LabelledDataset, UnlabelledDataset
 
 
 @dataclass
