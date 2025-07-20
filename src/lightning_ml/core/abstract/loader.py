@@ -4,11 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Sequence
 
-from lightning_ml.core.data.dataset import BaseDataset
-
-# Dataset implementations live in the data package but `BaseLoader` is located
-# under ``core.abstract``. Import directly from the public data package to avoid
-# circular dependencies and to keep this module self contained.
+from lightning_ml.core.abstract.dataset import BaseDataset
 from lightning_ml.core.data.datasets import LabelledDataset, UnlabelledDataset
 
 

@@ -13,15 +13,33 @@ from typing import Any
 
 from ...utils.enums import Registries
 from ...utils.registry import register
-from ..dataset import ContastiveDatasetBase, TripletDatasetBase
+from ..mixins import InputMixin, NegativeMixin, PositiveMixin
 from .labelled import LabelledDataset
 from .unlabelled import UnlabelledDataset
 
 __all__ = [
+    "ContastiveDatasetBase",
+    "TripletDatasetBase",
     "ContrastiveLabelledDataset",
     "ContrastiveUnlabelledDataset",
     "TripletDataset",
 ]
+
+
+class ContastiveDatasetBase(InputMixin, PositiveMixin):
+    """
+    Abstract base for contrastive datasets.
+
+    Combines mix-ins to enforce retrieval of input and positive samples.
+    """
+
+
+class TripletDatasetBase(ContastiveDatasetBase, NegativeMixin):
+    """
+    Abstract base for triplet datasets.
+
+    Combines mix-ins to enforce retrieval of input, positive, and negative samples.
+    """
 
 
 @register(Registries.DATASET)

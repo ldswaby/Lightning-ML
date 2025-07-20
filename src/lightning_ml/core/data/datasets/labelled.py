@@ -10,9 +10,17 @@ from typing import Any
 
 from ...utils.enums import Registries
 from ...utils.registry import register
-from ..dataset import LabelledDatasetBase
+from ..mixins import InputMixin, TargetMixin
 
-__all__ = ["LabelledDataset"]
+__all__ = ["LabelledDatasetBase", "LabelledDataset"]
+
+
+class LabelledDatasetBase(InputMixin, TargetMixin):
+    """
+    Abstract base for labeled datasets.
+
+    Combines mix-ins to enforce retrieval of input and target samples.
+    """
 
 
 @register(Registries.DATASET)

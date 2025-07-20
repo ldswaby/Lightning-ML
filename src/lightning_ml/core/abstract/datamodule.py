@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Dict, Optional, Type
 
 import pytorch_lightning as pl
-from sklearn.model_selection._split import BaseCrossValidator
 from torch.nn import ModuleDict
 from torch.utils.data import DataLoader
 
-from ...utils.data import validation_split
 from .dataset import BaseDataset
 
 __all__ = ["DataModule"]

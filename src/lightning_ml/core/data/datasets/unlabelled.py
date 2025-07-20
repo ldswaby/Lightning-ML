@@ -10,9 +10,17 @@ from typing import Any
 
 from ...utils.enums import Registries
 from ...utils.registry import register
-from ..dataset import UnlabelledDatasetBase
+from ..mixins import InputMixin
 
-__all__ = ["UnlabelledDataset"]
+__all__ = ["UnlabelledDatasetBase", "UnlabelledDataset"]
+
+
+class UnlabelledDatasetBase(InputMixin):
+    """
+    Abstract base for unlabeled datasets.
+
+    Combines mix-ins to enforce retrieval of input samples only.
+    """
 
 
 @register(Registries.DATASET)
