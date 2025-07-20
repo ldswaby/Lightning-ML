@@ -4,11 +4,12 @@ from typing import Any, Dict, Optional
 
 from torch import Tensor
 
-from . import LEARNER_REG
+from ..utils.enums import Registries
+from ..utils.registry import register
 from ..core import Learner
 
 
-@LEARNER_REG.register()
+@register(Registries.LEARNER)
 class Unsupervised(Learner):
     """Generic unsupervised learning task."""
 

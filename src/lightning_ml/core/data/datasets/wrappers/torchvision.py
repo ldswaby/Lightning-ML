@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Type
 
-from .. import DATASET_REG
+from ....utils.enums import Registries
+from ....utils.registry import register
 from ..abstract import LabelledDatasetBase
 
 __all__ = ["TorchvisionDataset"]
@@ -15,7 +16,7 @@ except Exception as e:  # pragma: no cover - import dependency
     raise ImportError("PyTorch is required for TorchvisionDataset") from e
 
 
-@DATASET_REG.register()
+@register(Registries.DATASET)
 class TorchvisionDataset(LabelledDatasetBase):
     """
     Wraps a torchvision dataset to adapt it to Lightning-ML's Dataset API.

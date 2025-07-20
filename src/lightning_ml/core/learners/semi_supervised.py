@@ -7,13 +7,14 @@ from collections.abc import Callable
 
 from torch import Tensor
 
-from . import LEARNER_REG
+from ..utils.enums import Registries
+from ..utils.registry import register
 from ..core import Learner
 
 __all__ = ["SemiSupervised"]
 
 
-@LEARNER_REG.register()
+@register(Registries.LEARNER)
 class SemiSupervised(Learner):
     """Generic semi-supervised learning task.
 

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from ..utils.registry import Registry
+from ..utils.enums import Registries
+from ..utils.registry import get_registry
 
-PREDICTOR_REG = Registry("Predictor")
+PREDICTOR_REG = get_registry(Registries.PREDICTOR)
 
 from .classification import *  # noqa: F401,F403
 from .regression import *  # noqa: F401,F403

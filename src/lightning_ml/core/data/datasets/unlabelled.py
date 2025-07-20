@@ -8,13 +8,14 @@ input and target sequences.
 from typing import Any, Optional
 from collections.abc import Callable, Sequence
 
-from . import DATASET_REG
+from ...utils.enums import Registries
+from ...utils.registry import register
 from .abstract import UnlabelledDatasetBase
 
 __all__ = ["UnlabelledDataset"]
 
 
-@DATASET_REG.register()
+@register(Registries.DATASET)
 class UnlabelledDataset(UnlabelledDatasetBase):
     """Generic labelled dataset with optional transforms.
 

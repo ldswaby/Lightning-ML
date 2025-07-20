@@ -1,4 +1,11 @@
-from pytorch_lightning.utilities.enums import LightningEnum
+try:  # pragma: no cover - dependency check
+    from pytorch_lightning.utilities.enums import LightningEnum
+except Exception:  # pragma: no cover - fallback when lightning not installed
+    from enum import Enum
+
+    class LightningEnum(str, Enum):
+        """Minimal fallback for :class:`pytorch_lightning.utilities.enums.LightningEnum`."""
+        pass
 
 
 class DataKeys(LightningEnum):

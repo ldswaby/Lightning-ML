@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from lightning_ml.core.utils.registry import Registry
+from lightning_ml.core.utils.enums import Registries
+from lightning_ml.core.utils.registry import get_registry
 
 # Define the registry before importing submodules that register with it to
 # avoid import cycles during package initialisation.
-DATASET_REG = Registry("Dataset")
+DATASET_REG = get_registry(Registries.DATASET)
 
 # Import dataset implementations which will register themselves with
 # ``DATASET_REG`` on import.
