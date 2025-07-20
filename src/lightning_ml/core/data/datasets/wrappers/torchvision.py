@@ -6,7 +6,7 @@ from typing import Any, Type
 
 from ....utils.enums import Registries
 from ....utils.registry import register
-from ..abstract import LabelledDatasetBase
+from ...dataset import LabelledDatasetBase
 
 __all__ = ["TorchvisionDataset"]
 
