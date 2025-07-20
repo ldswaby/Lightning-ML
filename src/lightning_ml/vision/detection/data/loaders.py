@@ -1,4 +1,4 @@
-# lightning_ml/data/loaders/yolo_folder.py
+# lightning_ml/vision/detection/data/loaders.py
 from __future__ import annotations
 
 import os
@@ -90,8 +90,6 @@ class YOLOFolder(ImageFolder):
             raise FileNotFoundError(f"Images folder not found: {self.images_dir}")
         if not self.labels_dir.exists():
             raise FileNotFoundError(f"Labels folder not found: {self.labels_dir}")
-
-    def _find_targets(self)
 
     # --------------------------------------------------------
     # Overrides
