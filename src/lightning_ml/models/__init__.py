@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from ..core.utils.registry import Registry
+from ..core.utils.enums import Registries
+from ..core.utils.registry import get_registry
 
-MODEL_REG = Registry("Model")
+MODEL_REG = get_registry(Registries.MODEL)
 
 from .example import *  # noqa: F401,F403
 

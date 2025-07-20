@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from torch import Tensor
 
-from . import PREDICTOR_REG
+from ..utils.enums import Registries
+from ..utils.registry import register
 from ..core import Predictor
 
 __all__ = ["Regression"]
 
 
-@PREDICTOR_REG.register()
+@register(Registries.PREDICTOR)
 class Regression(Predictor):
     """Return regression outputs as 1D tensors."""
 

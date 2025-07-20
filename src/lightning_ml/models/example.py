@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import torch.nn as nn
 
-from . import MODEL_REG
+from ..core.utils.enums import Registries
+from ..core.utils.registry import register
 
 __all__ = ["MyCustomModel"]
 
 
-@MODEL_REG.register("MyCustomModel")
+@register(Registries.MODEL, "MyCustomModel")
 class MyCustomModel(nn.Module):
     """Simple fully connected network used as an example."""
 

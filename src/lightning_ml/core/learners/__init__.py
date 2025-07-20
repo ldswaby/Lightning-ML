@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from ..utils.registry import Registry
+from ..utils.enums import Registries
+from ..utils.registry import get_registry
 
-LEARNER_REG = Registry("Learner")
+LEARNER_REG = get_registry(Registries.LEARNER)
 
 from .contrastive import Contrastive  # noqa: F401
 from .supervised import Supervised  # noqa: F401

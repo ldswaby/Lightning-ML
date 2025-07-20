@@ -8,13 +8,14 @@ from collections.abc import Sequence
 
 from torch import Tensor
 
+from ..utils.enums import Registries
+from ..utils.registry import register
 from ..core import Predictor
-from . import PREDICTOR_REG
 
 __all__ = ["Classification"]
 
 
-@PREDICTOR_REG.register()
+@register(Registries.PREDICTOR)
 class Classification(Predictor):
     """Predictor for classification tasks.
 
