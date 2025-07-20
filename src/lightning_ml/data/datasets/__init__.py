@@ -3,14 +3,19 @@
 from __future__ import annotations
 
 from ...utils.registry import Registry
+
+# Define the registry before importing submodules that register with it to
+# avoid import cycles during package initialisation.
+DATASET_REG = Registry("Dataset")
+
+# Import dataset implementations which will register themselves with
+# ``DATASET_REG`` on import.
 from .abstract import *  # noqa: F401,F403
 from .contrastive import *  # noqa: F401,F403
 from .disk import *  # noqa: F401,F403
 from .labelled import *  # noqa: F401,F403
 from .unlabelled import *  # noqa: F401,F403
 from .wrappers import TorchvisionDataset
-
-DATASET_REG = Registry("Dataset")
 
 
 __all__ = [
