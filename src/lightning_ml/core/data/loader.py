@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from typing import Any, Sequence
 
 from lightning_ml.core.data.dataset import BaseDataset
-from lightning_ml.data.datasets import LabelledDataset, UnlabelledDataset
+
+from .datasets import LabelledDataset, UnlabelledDataset
 
 
 @dataclass
@@ -26,13 +27,15 @@ class BaseLoader(ABC):
         dataset_cls: BaseDataset | None = None,
         **dataset_kwargs,
     ):
-        """_summary_
+        """Return an instantiated dataset containing the loaded samples.
 
         Args:
-            dataset_cls (Optional[BaseDataset], optional): _description_. Defaults to None.
+            dataset_cls: Optional dataset type to use. If ``None`` then
+                :class:`UnlabelledDataset` is used when ``fetch_samples`` does
+                not return targets, otherwise :class:`LabelledDataset`.
 
         Returns:
-            _type_: _description_
+            The created dataset instance.
         """
         inputs = self.load_inputs()
         targets = self.load_targets()

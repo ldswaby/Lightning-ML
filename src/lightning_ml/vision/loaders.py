@@ -4,7 +4,6 @@ Defines data loader classes for loading images from file paths or folders,
 with simple interfaces to return loaded image objects.
 """
 
-import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional, Sequence
@@ -42,10 +41,10 @@ class ImageFolder(Folder):
         recursive: bool = False,
         load_targets: Callable[[str | Path], Optional[Sequence[Any]]] | None = None,
     ):
-        """Initialize the ImageFolder loader.
+        """Initialize the :class:`ImageFolder` loader.
 
         Args:
-            folder (str): Path to the directory containing image files.
+            root: Path to the directory containing image files.
         """
         super().__init__(
             root=root,
