@@ -1,7 +1,4 @@
-try:  # pragma: no cover - optional dependency
-    from pytorch_lightning.utilities.enums import LightningEnum
-except Exception:  # pragma: no cover - fallback when PL not installed
-    from enum import Enum as LightningEnum
+from pytorch_lightning.utilities.enums import LightningEnum
 
 
 class DataKeys(LightningEnum):
@@ -13,9 +10,6 @@ class DataKeys(LightningEnum):
     NEGATIVE = "negative"
     PREDS = "prediction"
     METADATA = "metadata"
-
-    def __hash__(self) -> int:
-        return hash(self.value)
 
 
 class InputFormat(LightningEnum):
@@ -35,9 +29,6 @@ class InputFormat(LightningEnum):
     # DATAFRAME = "data_frame"
     # LISTS = "lists"
     # LABELSTUDIO = "labelstudio"
-
-    def __hash__(self) -> int:
-        return hash(self.value)
 
 
 class RunningStage(LightningEnum):
@@ -62,3 +53,14 @@ class RunningStage(LightningEnum):
     PREDICTING = "predict"
     # SERVING = "serve"
     # TUNING = "tune"
+
+
+class Registries(LightningEnum):
+    """The ``DataKeys`` enum contains the keys that are used by built-in data sources to refer to inputs and targets."""
+
+    LOADER = "loader"
+    DATASET = "dataset"
+    MODEL = "model"
+    LOSS = "loss"
+    LEARNER = "learner"
+    PREDICTOR = "predictor"

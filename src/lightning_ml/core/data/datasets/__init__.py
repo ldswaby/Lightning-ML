@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from lightning_ml.utils.registry import Registry
+from lightning_ml.core.utils.registry import Registry
 
 # Define the registry before importing submodules that register with it to
 # avoid import cycles during package initialisation.

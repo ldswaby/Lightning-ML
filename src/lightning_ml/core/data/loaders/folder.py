@@ -1,7 +1,7 @@
 import os
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from lightning_ml.core.data import BaseLoader
 from lightning_ml.core.utils.loading import has_file_allowed_extension
@@ -92,28 +92,3 @@ class Folder(BaseLoader):
             Sequence[Any] | None: _description_
         """
         return self._load_targets(self.root)
-
-    # def fetch_samples(self) -> tuple[Sequence[Any], Sequence[Any] | None]:
-    #     """Fetch input samples and their targets (if any)."""
-    #     root_path = Path(self.root)
-    #     classes = self.load_targets(root_path)
-
-    #     # Case 1 – unlabelled dataset (no class sub‑directories)
-    #     if not classes:
-    #         paths = self._iter_valid_files(root_path)
-    #         return [self.file_loader(p) for p in paths], None
-
-    #     # Case 2 – labelled dataset
-    #     inputs: list[Any] = []
-    #     targets: list[str] = []  # TODO: change for target formatter
-
-    #     for class_name in classes:
-    #         class_dir = root_path / class_name
-    #         if not class_dir.is_dir():
-    #             continue  # Skip if the expected folder is missing
-
-    #         for path in self._iter_valid_files(class_dir):
-    #             inputs.append(self.file_loader(path))
-    #             targets.append(class_name)
-
-    #     return inputs, targets

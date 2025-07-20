@@ -5,16 +5,17 @@ This module provides a simple in-memory labeled dataset that stores
 input and target sequences.
 """
 
-from typing import Any, Optional
 from collections.abc import Callable, Sequence
+from typing import Any, Optional
 
-from . import DATASET_REG
+from ...utils.enums import Registries
+from ...utils.registry import register
 from .abstract import LabelledDatasetBase
 
 __all__ = ["LabelledDataset"]
 
 
-@DATASET_REG.register()
+@register(Registries.DATASET)
 class LabelledDataset(LabelledDatasetBase):
     """Generic labelled dataset with optional transforms.
 

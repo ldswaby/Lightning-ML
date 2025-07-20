@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 from typing import Optional
 
-from .registry import Registry
+from ..core.utils.registry import Registry
 
 __all__ = [
     "register_torchvision_models",
@@ -35,7 +35,8 @@ def register_torchvision_models(registry: Registry | None = None) -> None:
         getters = {
             name: obj
             for name, obj in inspect.getmembers(tv.models)
-            if not name.startswith("_") and (inspect.isfunction(obj) or inspect.isclass(obj))
+            if not name.startswith("_")
+            and (inspect.isfunction(obj) or inspect.isclass(obj))
         }
 
     for name, fn in getters.items():
