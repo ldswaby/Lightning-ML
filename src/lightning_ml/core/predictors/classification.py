@@ -10,7 +10,7 @@ from torch import Tensor
 
 from ..utils.enums import Registries
 from ..utils.registry import register
-from ..core import Predictor
+from ..abstract import Predictor
 
 __all__ = ["Classification"]
 
