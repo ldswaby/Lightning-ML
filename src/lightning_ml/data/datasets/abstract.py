@@ -9,7 +9,10 @@ This module provides:
 from typing import Any
 from collections.abc import Sequence
 
-from ..core import BaseDataset
+# Import ``BaseDataset`` directly from the core package to avoid relying on a
+# non-existent ``data.core`` module and to prevent circular imports when the
+# top-level package is initialised.
+from lightning_ml.core.data.dataset import BaseDataset
 
 __all__ = [
     "InputMixin",
