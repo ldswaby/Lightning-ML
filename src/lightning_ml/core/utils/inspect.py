@@ -7,7 +7,7 @@ import importlib
 import inspect
 from dataclasses import fields, is_dataclass
 from types import ModuleType
-from typing import Any, List, Type, Union
+from typing import Any
 from collections.abc import Callable
 
 __all__ = [

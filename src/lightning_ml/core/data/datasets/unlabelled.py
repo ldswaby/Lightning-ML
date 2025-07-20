@@ -5,12 +5,12 @@ This module provides a simple in-memory labeled dataset that stores
 input and target sequences.
 """
 
-from typing import Any, Optional
 from collections.abc import Callable, Sequence
+from typing import Any
 
 from ...utils.enums import Registries
 from ...utils.registry import register
-from .abstract import UnlabelledDatasetBase
+from ..dataset import UnlabelledDatasetBase
 
 __all__ = ["UnlabelledDataset"]
 

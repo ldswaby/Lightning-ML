@@ -8,12 +8,12 @@ This module provides:
 """
 
 import random
-from typing import Any, Optional
 from collections.abc import Callable, Sequence
+from typing import Any
 
 from ...utils.enums import Registries
 from ...utils.registry import register
-from .abstract import ContastiveDatasetBase, TripletDatasetBase
+from ..dataset import ContastiveDatasetBase, TripletDatasetBase
 from .labelled import LabelledDataset
 from .unlabelled import UnlabelledDataset
 

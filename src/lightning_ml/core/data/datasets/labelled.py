@@ -6,11 +6,11 @@ input and target sequences.
 """
 
 from collections.abc import Callable, Sequence
-from typing import Any, Optional
+from typing import Any
 
 from ...utils.enums import Registries
 from ...utils.registry import register
-from .abstract import LabelledDatasetBase
+from ..dataset import LabelledDatasetBase
 
 __all__ = ["LabelledDataset"]
 

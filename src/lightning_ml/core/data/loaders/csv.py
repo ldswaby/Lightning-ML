@@ -30,11 +30,12 @@ class CSVLoader(BaseLoader):
 
         return pd.read_csv(self.path, **(self.read_kwargs or {}))
 
-    def fetch_samples(self) -> tuple[Sequence[Any], Sequence[Any] | None]:
-        inputs = self._df[list(self.input_cols)].to_dict("records")
-        targets = (
+    def load_inputs(self) -> Sequence[Any]:
+        return self._df[list(self.input_cols)].to_dict("records")
+
+    def load_targets(self) -> Sequence[Any] | None:
+        return (
             None
             if self.target_cols is None
             else self._df[list(self.target_cols)].to_dict("records")
         )
-        return inputs, targets
