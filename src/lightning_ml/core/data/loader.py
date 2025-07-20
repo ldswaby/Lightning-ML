@@ -8,12 +8,20 @@ from lightning_ml.core.data.dataset import BaseDataset
 from lightning_ml.data.datasets import LabelledDataset, UnlabelledDataset
 
 
+@dataclass
 class BaseLoader(ABC):
     """Base class for loading data from various sources"""
 
     @abstractmethod
-    def fetch_samples(self) -> tuple[Sequence[Any], Sequence[Any] | None]:
-        """Fetch input(s) and (optionally) targets"""
+    def load_inputs(self) -> Sequence[Any]:
+        """Fetch input(s)"""
+
+    def load_targets(self) -> Optional[Sequence[Any]]:
+        """Return target(s), if present"""
+
+    # @abstractmethod
+    # def fetch_samples(self) -> tuple[Sequence[Any], Optional[Sequence[Any]]]:
+    #     """Fetch input(s) and (optionally) targets"""
 
     def as_dataset(
         self,
