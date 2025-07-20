@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # from .data.datamodule import DataModule
-from .data.dataset import BaseDataset
+from . import data
 from .learner import Learner
 from .predictor import Predictor
 from .school import School

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Optional, Sequence
 
 from lightning_ml.core.data.dataset import BaseDataset
-from lightning_ml.datasets import LabelledDataset, UnlabelledDataset
+from lightning_ml.data.datasets import LabelledDataset, UnlabelledDataset
 
 
 @dataclass
