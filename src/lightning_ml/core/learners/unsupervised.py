@@ -6,7 +6,7 @@ from torch import Tensor
 
 from ..utils.enums import Registries
 from ..utils.registry import register
-from ..core import Learner
+from ..abstract import Learner
 
 
 @register(Registries.LEARNER)

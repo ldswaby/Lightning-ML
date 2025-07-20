@@ -5,7 +5,9 @@ except Exception:  # pragma: no cover - fallback when lightning not installed
 
     class LightningEnum(str, Enum):
         """Minimal fallback for :class:`pytorch_lightning.utilities.enums.LightningEnum`."""
-        pass
+
+        def __str__(self) -> str:  # pragma: no cover - parity with LightningEnum
+            return str(self.value)
 
 
 class DataKeys(LightningEnum):
