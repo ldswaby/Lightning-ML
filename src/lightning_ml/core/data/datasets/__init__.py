@@ -14,4 +14,3 @@ REGISTRY = get_registry(Registries.DATASET)
 from .contrastive import *  # noqa: F401,F403
 from .labelled import *  # noqa: F401,F403
 from .unlabelled import *  # noqa: F401,F403
-from .disk import *  # noqa: F401,F403
