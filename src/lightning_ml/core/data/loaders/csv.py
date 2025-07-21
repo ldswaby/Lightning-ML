@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Sequence
 
-from lightning_ml.core.data import BaseLoader
+from lightning_ml.core.abstract.loader import BaseLoader
 from lightning_ml.core.utils.imports import requires
 
 

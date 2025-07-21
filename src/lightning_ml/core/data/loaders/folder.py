@@ -3,7 +3,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any, Optional
 
-from lightning_ml.core.data import BaseLoader
+from lightning_ml.core.abstract.loader import BaseLoader
 from lightning_ml.core.utils.loading import has_file_allowed_extension
 
 

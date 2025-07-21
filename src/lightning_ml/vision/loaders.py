@@ -8,7 +8,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional, Sequence
 
-from lightning_ml.core.data import BaseLoader
+from lightning_ml.core.abstract.loader import BaseLoader
 from lightning_ml.core.data.loaders.folder import Folder
 from lightning_ml.core.utils.loading import IMG_EXTENSIONS, load_image
 

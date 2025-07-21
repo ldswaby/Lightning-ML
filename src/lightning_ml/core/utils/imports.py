@@ -31,6 +31,7 @@ import functools
 import importlib
 import operator
 import types
+import sys
 from typing import Any, Callable, List, Tuple, TypeVar, Union
 
 from lightning_utilities.core.imports import compare_version, module_available
@@ -53,58 +54,72 @@ except (ModuleNotFoundError, DistributionNotFound):
     Version = None
 
 
-_TORCH_AVAILABLE = module_available("torch")
-_PL_AVAILABLE = module_available("pytorch_lightning")
-_BOLTS_AVAILABLE = module_available("pl_bolts") and compare_version(
+def _safe_module_available(name: str) -> bool:
+    """Return True if the given module can be imported.
+
+    This wrapper mirrors :func:`lightning_utilities.core.imports.module_available`
+    but gracefully handles modules already present in ``sys.modules`` that may
+    not have a proper ``__spec__`` (as is the case in the test suite).
+    """
+    if name in sys.modules:
+        return True
+    try:
+        return module_available(name)
+    except Exception:
+        return False
+
+_TORCH_AVAILABLE = _safe_module_available("torch")
+_PL_AVAILABLE = _safe_module_available("pytorch_lightning")
+_BOLTS_AVAILABLE = _safe_module_available("pl_bolts") and compare_version(
     "torch", operator.lt, "1.9.0"
 )
-_PANDAS_AVAILABLE = module_available("pandas")
-_SKLEARN_AVAILABLE = module_available("sklearn")
-_PYTORCHTABULAR_AVAILABLE = module_available("pytorch_tabular")
-_FORECASTING_AVAILABLE = module_available("pytorch_forecasting")
-_KORNIA_AVAILABLE = module_available("kornia")
-_COCO_AVAILABLE = module_available("pycocotools")
-_TIMM_AVAILABLE = module_available("timm")
-_TORCHVISION_AVAILABLE = module_available("torchvision")
-_PYTORCHVIDEO_AVAILABLE = module_available("pytorchvideo")
-_MATPLOTLIB_AVAILABLE = module_available("matplotlib")
-_TRANSFORMERS_AVAILABLE = module_available("transformers")
-_PYSTICHE_AVAILABLE = module_available("pystiche")
+_PANDAS_AVAILABLE = _safe_module_available("pandas")
+_SKLEARN_AVAILABLE = _safe_module_available("sklearn")
+_PYTORCHTABULAR_AVAILABLE = _safe_module_available("pytorch_tabular")
+_FORECASTING_AVAILABLE = _safe_module_available("pytorch_forecasting")
+_KORNIA_AVAILABLE = _safe_module_available("kornia")
+_COCO_AVAILABLE = _safe_module_available("pycocotools")
+_TIMM_AVAILABLE = _safe_module_available("timm")
+_TORCHVISION_AVAILABLE = _safe_module_available("torchvision")
+_PYTORCHVIDEO_AVAILABLE = _safe_module_available("pytorchvideo")
+_MATPLOTLIB_AVAILABLE = _safe_module_available("matplotlib")
+_TRANSFORMERS_AVAILABLE = _safe_module_available("transformers")
+_PYSTICHE_AVAILABLE = _safe_module_available("pystiche")
 with contextlib.suppress(ConnectionError):
-    _FIFTYONE_AVAILABLE = module_available("fiftyone")
-_FASTAPI_AVAILABLE = module_available("fastapi")
-_PYDANTIC_AVAILABLE = module_available("pydantic")
-_GRAPHVIZ_AVAILABLE = module_available("graphviz")
-_CYTOOLZ_AVAILABLE = module_available("cytoolz")
-_UVICORN_AVAILABLE = module_available("uvicorn")
-_PIL_AVAILABLE = module_available("PIL")
-_OPEN3D_AVAILABLE = module_available("open3d")
-_SEGMENTATION_MODELS_AVAILABLE = module_available("segmentation_models_pytorch")
-_FASTFACE_AVAILABLE = module_available("fastface") and compare_version(
+    _FIFTYONE_AVAILABLE = _safe_module_available("fiftyone")
+_FASTAPI_AVAILABLE = _safe_module_available("fastapi")
+_PYDANTIC_AVAILABLE = _safe_module_available("pydantic")
+_GRAPHVIZ_AVAILABLE = _safe_module_available("graphviz")
+_CYTOOLZ_AVAILABLE = _safe_module_available("cytoolz")
+_UVICORN_AVAILABLE = _safe_module_available("uvicorn")
+_PIL_AVAILABLE = _safe_module_available("PIL")
+_OPEN3D_AVAILABLE = _safe_module_available("open3d")
+_SEGMENTATION_MODELS_AVAILABLE = _safe_module_available("segmentation_models_pytorch")
+_FASTFACE_AVAILABLE = _safe_module_available("fastface") and compare_version(
     "pytorch_lightning", operator.lt, "1.5.0"
 )
-_LIBROSA_AVAILABLE = module_available("librosa")
-_TORCH_SCATTER_AVAILABLE = module_available("torch_scatter")
-_TORCH_SPARSE_AVAILABLE = module_available("torch_sparse")
-_TORCH_GEOMETRIC_AVAILABLE = module_available("torch_geometric")
-_NETWORKX_AVAILABLE = module_available("networkx")
-_TORCHAUDIO_AVAILABLE = module_available("torchaudio")
-_SENTENCEPIECE_AVAILABLE = module_available("sentencepiece")
-_DATASETS_AVAILABLE = module_available("datasets")
-_TM_TEXT_AVAILABLE: bool = module_available("torchmetrics.text")
-_ICEVISION_AVAILABLE = module_available("icevision")
-_ICEDATA_AVAILABLE = module_available("icedata")
-_LEARN2LEARN_AVAILABLE = module_available("learn2learn") and compare_version(
+_LIBROSA_AVAILABLE = _safe_module_available("librosa")
+_TORCH_SCATTER_AVAILABLE = _safe_module_available("torch_scatter")
+_TORCH_SPARSE_AVAILABLE = _safe_module_available("torch_sparse")
+_TORCH_GEOMETRIC_AVAILABLE = _safe_module_available("torch_geometric")
+_NETWORKX_AVAILABLE = _safe_module_available("networkx")
+_TORCHAUDIO_AVAILABLE = _safe_module_available("torchaudio")
+_SENTENCEPIECE_AVAILABLE = _safe_module_available("sentencepiece")
+_DATASETS_AVAILABLE = _safe_module_available("datasets")
+_TM_TEXT_AVAILABLE: bool = _safe_module_available("torchmetrics.text")
+_ICEVISION_AVAILABLE = _safe_module_available("icevision")
+_ICEDATA_AVAILABLE = _safe_module_available("icedata")
+_LEARN2LEARN_AVAILABLE = _safe_module_available("learn2learn") and compare_version(
     "learn2learn", operator.ge, "0.1.6"
 )
-_TORCH_ORT_AVAILABLE = module_available("torch_ort")
-_VISSL_AVAILABLE = module_available("vissl") and module_available("classy_vision")
-_ALBUMENTATIONS_AVAILABLE = module_available("albumentations")
-_BAAL_AVAILABLE = module_available("baal")
-_TORCH_OPTIMIZER_AVAILABLE = module_available("torch_optimizer")
-_SENTENCE_TRANSFORMERS_AVAILABLE = module_available("sentence_transformers")
-_DEEPSPEED_AVAILABLE = module_available("deepspeed")
-_EFFDET_AVAILABLE = module_available("effdet")
+_TORCH_ORT_AVAILABLE = _safe_module_available("torch_ort")
+_VISSL_AVAILABLE = _safe_module_available("vissl") and _safe_module_available("classy_vision")
+_ALBUMENTATIONS_AVAILABLE = _safe_module_available("albumentations")
+_BAAL_AVAILABLE = _safe_module_available("baal")
+_TORCH_OPTIMIZER_AVAILABLE = _safe_module_available("torch_optimizer")
+_SENTENCE_TRANSFORMERS_AVAILABLE = _safe_module_available("sentence_transformers")
+_DEEPSPEED_AVAILABLE = _safe_module_available("deepspeed")
+_EFFDET_AVAILABLE = _safe_module_available("effdet")
 
 
 if _PIL_AVAILABLE:
@@ -236,7 +251,7 @@ def requires(*module_paths: str | tuple[bool, str]) -> Callable[[F], F]:
                         available = False
                 else:
                     modules.append(module_path)
-                    if not module_available(module_path):
+                    if not _safe_module_available(module_path):
                         available = False
             else:
                 available, module_path = module_path

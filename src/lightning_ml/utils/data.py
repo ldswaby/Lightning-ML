@@ -12,9 +12,9 @@ from sklearn.model_selection._split import BaseCrossValidator
 from torch.utils.data import Subset
 
 # Avoid importing the entire ``lightning_ml.core`` package here to prevent
-# circular import issues when ``lightning_ml`` is imported.  Importing the
-# dataset module directly keeps dependencies minimal.
-from lightning_ml.core.data.dataset import BaseDataset
+# circular import issues when ``lightning_ml`` is imported. Import the
+# abstract :mod:`BaseDataset` directly.
+from lightning_ml.core.abstract.dataset import BaseDataset
 
 
 def validation_split(
