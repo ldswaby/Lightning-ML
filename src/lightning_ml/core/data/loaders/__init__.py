@@ -10,6 +10,5 @@ from lightning_ml.core.utils.registry import get_registry
 REGISTRY = get_registry(Registries.LOADER)
 
 # Import dataset implementations which will register themselves with
-# ``DATASET_REG`` on import.
-from .csv import *  # noqa: F401,F403
-from .folder import *  # noqa: F401,F403
+from .csv import *
+from .folder import *

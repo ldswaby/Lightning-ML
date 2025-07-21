@@ -11,6 +11,6 @@ REGISTRY = get_registry(Registries.DATASET)
 
 # Import dataset implementations which will register themselves with
 # ``DATASET_REG`` on import.
-from .contrastive import *  # noqa: F401,F403
-from .labelled import *  # noqa: F401,F403
-from .unlabelled import *  # noqa: F401,F403
+from .contrastive import *
+from .labelled import *
+from .unlabelled import *

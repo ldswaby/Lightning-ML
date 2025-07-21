@@ -1,25 +1,51 @@
-# Copyright The PyTorch Lightning team.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+"""
+Utility helpers for dependency management and dynamic imports used throughout the
+:pyproj:`lightning_ml` code‑base.
+
+The main entry‑point is :pyfunc:`requires`, a decorator factory that guards a callable
+so it executes only when its optional dependencies are present. When a requirement is
+missing, the wrapped callable raises a :class:`ModuleNotFoundError` with an actionable
+*pip install* hint instead of failing at import‑time.
+
+Example
+-------
+    ```python
+    @requires("torch", "torchvision")
+    def forward():
+        ...
+    ```
+If either *torch* or *torchvision* are not installed, calling *forward* raises a clear
+error indicating which packages need to be installed.
+
+The module also exposes:
+
+* :pyfunc:`example_requires` – convenience wrapper for sample scripts.
+* :pyfunc:`import_from_str` – lightweight utility to import a symbol from its dotted
+  path (e.g. ``"torch.nn.Linear"``).
+
+All public symbols are re‑exported via :pydata:`__all__`.
+"""
+
 import contextlib
 import functools
 import importlib
 import operator
 import types
-from typing import List, Tuple, Union
+from typing import Any, Callable, List, Tuple, TypeVar, Union
 
 from lightning_utilities.core.imports import compare_version, module_available
 from pkg_resources import DistributionNotFound
+
+__all__: list[str] = [
+    "requires",
+    "example_requires",
+    "import_from_str",
+]
+
+
+# Generic type used by decorators
+F = TypeVar("F", bound=Callable[..., Any])
+
 
 try:
     from packaging.version import Version
@@ -101,7 +127,7 @@ if Version:
     _TM_GREATER_EQUAL_0_10_0 = compare_version("torchmetrics", operator.ge, "0.10.0")
     _BAAL_GREATER_EQUAL_1_5_2 = compare_version("baal", operator.ge, "1.5.2")
     _TRANSFORMERS_GREATER_EQUAL_4_0 = compare_version(
-        "transformers", operator.ge, "1.5.2"
+        "transformers", operator.ge, "4.0.0"
     )
 
 _TOPIC_TEXT_AVAILABLE = all(
@@ -164,23 +190,38 @@ _EXTRAS_AVAILABLE = {
 }
 
 
-def requires(*module_paths: str | tuple[bool, str]):
-    """Decorator factory to enforce optional dependencies.
+def requires(*module_paths: str | tuple[bool, str]) -> Callable[[F], F]:
+    """Decorator factory to enforce optional runtime dependencies.
 
-    Checks that specified modules or extras are available before allowing
-    the decorated function to run. If any requirements are missing, calling
-    the function will raise a ModuleNotFoundError with instructions to install
-    the missing dependencies.
+    The decorator checks that all requested modules *or* extras are available
+    before allowing the wrapped callable to execute. Availability is evaluated
+    lazily at **call** time, not at **import** time, so that downstream modules
+    can be imported regardless of the user's local environment.
 
     Args:
-        *module_paths: One or more module names or (available_flag, module_name)
-            tuples. Strings represent modules or extra keys to check via
-            module_available/_EXTRAS_AVAILABLE; tuples allow custom availability.
+        *module_paths: Each element is either
+
+            * **str** – a module name tested with
+              :func:`lightning_utilities.core.imports.module_available` **or**
+              a key of :pydata:`_EXTRAS_AVAILABLE` (e.g. ``"image"``, ``"text"``).
+            * **tuple[bool, str]** – a pre‑computed availability flag and human
+              readable module name.
 
     Returns:
-        A decorator that wraps the function. The decorated function will run
-        normally if all dependencies are present, otherwise it will raise
-        ModuleNotFoundError when called.
+        Callable[[~F], ~F]: A decorator preserving the signature of *func*. If
+        dependencies are satisfied, it immediately invokes the function;
+        otherwise it raises :class:`ModuleNotFoundError` with installation
+        instructions.
+
+    Raises:
+        ModuleNotFoundError: If at least one required dependency is missing.
+
+    Example:
+        ```python
+        @_requires("torch", "pandas", (has_gpu, "CUDA Toolkit"))
+        def heavy_lifting():
+            ...
+        ```
     """
 
     def decorator(func):
@@ -219,5 +260,40 @@ def requires(*module_paths: str | tuple[bool, str]):
     return decorator
 
 
-def example_requires(module_paths: str | list[str]):
+def example_requires(module_paths: str | list[str]) -> None:
+    """Eagerly validate example‑level dependencies.
+
+    This convenience helper is intended for sample scripts and tutorials where
+    missing dependencies should cause an early, explicit failure at import
+    time (rather than at function call time).
+
+    Args:
+        module_paths: A single module name or list of modules/extras to test.
+
+    Raises:
+        ModuleNotFoundError: If *any* of the requested dependencies are absent.
+    """
     return requires(module_paths)(lambda: None)()
+
+
+def import_from_str(qual: str):
+    """Import an attribute from its fully‑qualified dotted path.
+
+    Args:
+        qual: A dotted path like ``"torch.nn.Linear"``.
+
+    Returns:
+        The imported attribute.
+
+    Raises:
+        ValueError: If *qual* does not contain a ``"."`` separator.
+        ModuleNotFoundError: If the target module cannot be imported.
+        AttributeError: If the attribute does not exist in the module.
+
+    Example:
+        >>> Linear = import_from_str("torch.nn.Linear")
+        >>> isinstance(Linear, type)
+        True
+    """
+    mod, cls = qual.rsplit(".", 1)
+    return getattr(importlib.import_module(mod), cls)

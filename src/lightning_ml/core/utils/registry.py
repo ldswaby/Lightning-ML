@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Dict, TypeVar
+
+from .imports import import_from_str
 
 __all__ = ["Registry", "get_registry", "register"]
 
@@ -101,3 +103,13 @@ def register(enum_val: Any, name: str | None = None) -> Callable[[T], T]:
         return obj
 
     return decorator
+
+
+def build(kind: str, cfg: Dict[str, Any], *args, **kw):
+    """Generic factory: cfg = {'name': 'mlp', 'params': {...}}"""
+    name = cfg["name"]
+    if "." in name:
+        cls_or_fn = import_from_str(name)
+    else:
+        cls_or_fn = _REGISTRIES[kind][name]
+    return cls_or_fn(*args, **cfg.get("params", {}), **kw)
