@@ -14,3 +14,4 @@ REGISTRY = get_registry(Registries.DATASET)
 from .contrastive import *
 from .labelled import *
 from .unlabelled import *
+from .numpy import *
