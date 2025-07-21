@@ -68,20 +68,27 @@ class Registry(dict):
 
 # Global enum-based registries
 
-# Internal mapping of enum values to Registry instances
-_REGISTRIES: dict[Any, Registry] = {}
+
+# Internal mapping of string keys to Registry instances
+_REGISTRIES: dict[str, Registry] = {}
 
 
-def get_registry(enum_val: Any) -> Registry:
-    """Get or create the :class:`Registry` associated with an enum value.
+def _to_key(kind: Any) -> str:
+    """Return the registry key as a string taken from an enum value or passed‑through string."""
+    return kind.value if hasattr(kind, "value") else kind
+
+
+def get_registry(kind: Any) -> Registry:
+    """Get or create the :class:`Registry` associated with ``kind``.
 
     Args:
-        enum_val: The enum value that identifies the registry.
+        kind: Enum value or string that identifies the registry.
 
     Returns:
         Registry: The corresponding registry instance.
     """
-    return _REGISTRIES.setdefault(enum_val, Registry(enum_val.value))
+    key = _to_key(kind)
+    return _REGISTRIES.setdefault(key, Registry(key))
 
 
 def register(enum_val: Any, name: str | None = None) -> Callable[[T], T]:
@@ -105,11 +112,12 @@ def register(enum_val: Any, name: str | None = None) -> Callable[[T], T]:
     return decorator
 
 
-def build(kind: str, cfg: Dict[str, Any], *args, **kw):
+def build(kind: Any, cfg: Dict[str, Any], *args, **kw):
     """Generic factory: cfg = {'name': 'mlp', 'params': {...}}"""
     name = cfg["name"]
+    key = _to_key(kind)
     if "." in name:
         cls_or_fn = import_from_str(name)
     else:
-        cls_or_fn = _REGISTRIES[kind][name]
+        cls_or_fn = _REGISTRIES[key][name]
     return cls_or_fn(*args, **cfg.get("params", {}), **kw)
