@@ -14,7 +14,7 @@ from torch.utils.data import Subset
 # Avoid importing the entire ``lightning_ml.core`` package here to prevent
 # circular import issues when ``lightning_ml`` is imported.  Importing the
 # dataset module directly keeps dependencies minimal.
-from lightning_ml.core.data.dataset import BaseDataset
+from lightning_ml.core.data import BaseDataset
 
 
 def validation_split(
