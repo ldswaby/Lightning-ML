@@ -6,6 +6,8 @@ from typing import Any, Callable, TypeVar
 
 from .enums import Registries
 from .imports import import_from_str
+from pathlib import Path
+from typing import Any
 
 __all__ = [
     "Registry",
@@ -243,3 +245,10 @@ def build_from_cfg(kind: Any, name: str, *args, **kwargs):
     """
     params = kwargs.get("params", {})
     return build(kind, name, *args, **params)
+
+
+def instantiate_from_yaml(cfg_path: str | Path) -> Any:
+    """Instantiate an object from a YAML config file."""
+    from .config import instantiate_from_yaml as _impl
+
+    return _impl(cfg_path)
