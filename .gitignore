@@ -2,6 +2,7 @@
 lightning_logs/
 sandbox
 _data/
+outputs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,5 @@
+# Hydra will merge this under `cfg.model`
+name: "resnet50"
+params:
+  lr: 0.001
+  dropout: 0.1

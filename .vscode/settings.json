@@ -4,12 +4,12 @@
     // -------------------------------------------------------------------------
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter", // Run Black
-        "editor.formatOnSave": true, // Format every save
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit", // isort will reorder imports
-            "source.fixAll": "explicit" // Let linters offer quick-fixes
-        }
-    },
+    //     "editor.formatOnSave": true, // Format every save
+    //     "editor.codeActionsOnSave": {
+    //         "source.organizeImports": "explicit", // isort will reorder imports
+    //         "source.fixAll": "explicit" // Let linters offer quick-fixes
+    //     }
+    // },
 
     // -------------------------------------------------------------------------
     // Universal editor hygiene

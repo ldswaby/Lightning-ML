@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Callable, Dict, TypeVar
+from typing import Any, Callable, TypeVar
 
 from .enums import Registries
-from .imports import import_from_str, requires
+from .imports import import_from_str
 
 __all__ = [
     "Registry",
@@ -244,35 +243,3 @@ def build_from_cfg(kind: Any, name: str, *args, **kwargs):
     """
     params = kwargs.get("params", {})
     return build(kind, name, *args, **params)
-
-
-@requires("hydra.utils", "omegaconf")
-def instantiate_from_yaml(cfg_path: str | Path) -> Any:
-    """Instantiate an object from a YAML config using Hydra.
-
-    The YAML file must contain a ``_target_`` key. When using the
-    :func:`build_from_cfg` helper this typically looks like::
-
-        _target_: lightning_ml.core.utils.registry.build_from_cfg
-        kind: dataset
-        name: LabelledDataset
-        params:
-            inputs: [1, 2]
-            targets: [3, 4]
-
-    Parameters
-    ----------
-    cfg_path : str or Path
-        Path to the YAML configuration file.
-
-    Returns
-    -------
-    Any
-        The instantiated object as returned by ``hydra.utils.instantiate``.
-    """
-
-    from hydra.utils import instantiate
-    from omegaconf import OmegaConf
-
-    cfg = OmegaConf.load(str(cfg_path))
-    return instantiate(cfg)

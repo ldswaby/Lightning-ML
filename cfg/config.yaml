@@ -1,0 +1,5 @@
+defaults:
+  - dataset: labelled
+  - model: resnet
+
+seed: 42
