@@ -6,6 +6,8 @@ from typing import Any, Callable, TypeVar
 
 from .enums import Registries
 from .imports import import_from_str
+from pathlib import Path
+from typing import Any
 
 __all__ = [
     "Registry",
