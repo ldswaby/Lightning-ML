@@ -3,3 +3,4 @@
 from __future__ import annotations
 
 from . import abstract, data, learners, predictors, utils
+from .utils import REGISTRIES

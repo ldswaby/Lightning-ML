@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, TypeVar
 
 from .imports import import_from_str
 
-__all__ = ["Registry", "get_registry", "register"]
+__all__ = ["Registry", "REGISTRIES", "get_registry", "register", "build"]
 
 T = TypeVar("T")
 
@@ -70,7 +70,7 @@ class Registry(dict):
 
 
 # Internal mapping of string keys to Registry instances
-_REGISTRIES: dict[str, Registry] = {}
+REGISTRIES: dict[str, Registry] = {}
 
 
 def _to_key(kind: Any) -> str:
@@ -88,7 +88,7 @@ def get_registry(kind: Any) -> Registry:
         Registry: The corresponding registry instance.
     """
     key = _to_key(kind)
-    return _REGISTRIES.setdefault(key, Registry(key))
+    return REGISTRIES.setdefault(key, Registry(key))
 
 
 def register(enum_val: Any, name: str | None = None) -> Callable[[T], T]:
@@ -119,5 +119,5 @@ def build(kind: Any, cfg: Dict[str, Any], *args, **kw):
     if "." in name:
         cls_or_fn = import_from_str(name)
     else:
-        cls_or_fn = _REGISTRIES[key][name]
+        cls_or_fn = REGISTRIES[key][name]
     return cls_or_fn(*args, **cfg.get("params", {}), **kw)
