@@ -217,7 +217,35 @@ def build(kind: Any, name: str, *args, **kwargs):
     return cls_or_fn(*args, **kwargs)
 
 
-def build_from_cfg(kind: Any, name: str, *args, **kwargs):
+# def build_from_cfg(kind: Any, name: str, *args, **kwargs):
+#     """Instantiate a registered object using a configuration mapping.
+
+#     This convenience wrapper expects ``params`` to be provided in ``**kwargs``.
+#     If present, the mapping stored under ``params`` is unpacked and forwarded
+#     as keyword arguments to :func:`build`.
+
+#     Args:
+#         kind (Any): Registry bucket (string or enum) to search.
+#         name (str): Name of the registered component or a fully‑qualified
+#             import path.
+#         *args: Positional arguments forwarded to the target constructor.
+#         **kwargs: Should include an optional ``params`` mapping containing
+#             keyword arguments for the constructor. Any other keys are ignored.
+
+#     Returns:
+#         Any: The instantiated object.
+
+#     Example:
+#         >>> cfg = {"params": {"in_features": 3, "out_features": 2}}
+#         >>> obj = build_from_cfg("model", "Linear", **cfg)
+#         >>> obj.shape
+#         (3, 2)
+#     """
+#     params = kwargs.get("params", {})
+#     return build(kind, name, *args, **params)
+
+
+def build_from_cfg(config):
     """Instantiate a registered object using a configuration mapping.
 
     This convenience wrapper expects ``params`` to be provided in ``**kwargs``.
@@ -241,5 +269,8 @@ def build_from_cfg(kind: Any, name: str, *args, **kwargs):
         >>> obj.shape
         (3, 2)
     """
-    params = kwargs.get("params", {})
-    return build(kind, name, *args, **params)
+    config = config.to_dict()
+    kind = config.get("kind")
+    name = config.get("name")
+    params = config.get("params", {})
+    return build(kind, name, **params)

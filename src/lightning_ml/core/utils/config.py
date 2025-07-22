@@ -1,7 +1,10 @@
 # conf/config.py
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict
+
+from lightning_ml.core.utils.registry import build_from_cfg
+from lightning_ml.core.utils.enums import Registries
 
 from .imports import requires
 
@@ -38,16 +41,29 @@ def instantiate_from_yaml(cfg_path: str | Path) -> Any:
     return instantiate(cfg)
 
 
+
 @dataclass
-class DatasetConfig:
-    name: str
-    params: Dict[str, Any] = field(default_factory=dict)
+class ConfigBase:
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    def instantiate(self) -> Any:
+        return build_from_cfg(config=self)
 
 
 @dataclass
-class ModelConfig:
+class DatasetConfig(ConfigBase):
     name: str
     params: Dict[str, Any] = field(default_factory=dict)
+    kind: str = Registries.DATASET
+
+
+@dataclass
+class ModelConfig(ConfigBase):
+    name: str
+    params: Dict[str, Any] = field(default_factory=dict)
+    kind: str = Registries.MODEL
 
 
 # @dataclass
