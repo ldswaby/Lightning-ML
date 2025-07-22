@@ -192,7 +192,9 @@ def build(kind: Any, cfg: Dict[str, Any], *args, **kw):
         >>> obj.shape
         (3, 2)
     """
-    name = cfg["name"]
+    name = cfg.get("name", None)
+    if name is None:
+        raise KeyError("cfg must have a `name` key")
     key = _to_key(kind)
     if "." in name:
         cls_or_fn = import_from_str(name)
