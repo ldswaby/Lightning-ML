@@ -47,6 +47,18 @@ def test_register_torchvision_modules():
     torchmetrics.MetricCollection = object
     sys.modules['torchmetrics'] = torchmetrics
 
+    # Stub lightning_utilities
+    lu = types.ModuleType('lightning_utilities')
+    lu_core = types.ModuleType('core')
+    lu_imports = types.ModuleType('imports')
+    lu_imports.compare_version = lambda *a, **k: False
+    lu_imports.module_available = lambda name: False
+    lu_core.imports = lu_imports
+    lu.core = lu_core
+    sys.modules['lightning_utilities'] = lu
+    sys.modules['lightning_utilities.core'] = lu_core
+    sys.modules['lightning_utilities.core.imports'] = lu_imports
+
     # Stub torchvision with simple dataset and model
     tv = types.ModuleType('torchvision')
     tv_datasets = types.ModuleType('torchvision.datasets')
