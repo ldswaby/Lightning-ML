@@ -124,6 +124,18 @@ project = Project(learner, trainer=Trainer())
 project.train()
 ```
 
+## Hydra config files
+
+Components can also be instantiated from YAML configs using Hydra. Example
+configs live in the `config/` folder. They can be loaded with the helper
+`instantiate_from_yaml`:
+
+```python
+from lightning_ml.core.utils.registry import instantiate_from_yaml
+
+dataset = instantiate_from_yaml("config/dataset/labelled.yaml")
+```
+
 The framework stays intentionally small and flexible so you can plug in any PyTorch modules, metrics or Lightning `Trainer` configuration.
 
 ## License

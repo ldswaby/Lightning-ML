@@ -1,10 +1,12 @@
-import sys
 import types
+import sys
 import importlib
+from pathlib import Path
+import yaml
 
 
-def test_numpy_labelled_dataset_instantiation():
-    # Stub minimal dependencies
+def test_instantiate_from_yaml():
+    # Stub minimal dependencies as in other tests
     torch = types.ModuleType('torch')
     torch.Tensor = object
     torch.nn = types.ModuleType('nn')
@@ -60,9 +62,39 @@ def test_numpy_labelled_dataset_instantiation():
     sys.modules['lightning_utilities.core'] = lu_core
     sys.modules['lightning_utilities.core.imports'] = lu_imports
 
+    # Stub hydra and omegaconf so hydra isn't required
+    hydra = types.ModuleType('hydra')
+    hydra_utils = types.ModuleType('hydra.utils')
     sys.path.insert(0, 'src')
-    datasets = importlib.import_module('lightning_ml.datasets')
+    from lightning_ml.core.utils.imports import import_from_str
 
-    ds = datasets.NumpyLabelledDataset([1, 2], [3, 4])
+    def instantiate(cfg: dict):
+        fn = import_from_str(cfg.pop('_target_'))
+        return fn(**cfg)
+
+    hydra_utils.instantiate = instantiate
+    hydra.utils = hydra_utils
+    sys.modules['hydra'] = hydra
+    sys.modules['hydra.utils'] = hydra_utils
+
+    oc = types.ModuleType('omegaconf')
+
+    class _OC:
+        @staticmethod
+        def load(p):
+            with open(p) as fh:
+                return yaml.safe_load(fh)
+
+    oc.OmegaConf = _OC
+    sys.modules['omegaconf'] = oc
+
+    datasets = importlib.import_module('lightning_ml.datasets')
+    from lightning_ml.core.utils.registry import instantiate_from_yaml
+
+    cfg_path = Path('config/dataset/labelled.yaml')
+
+    ds = instantiate_from_yaml(cfg_path)
+    assert isinstance(ds, datasets.LabelledDataset)
     assert len(ds) == 2
+
 

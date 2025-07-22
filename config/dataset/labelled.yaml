@@ -1,0 +1,6 @@
+_target_: lightning_ml.core.utils.registry.build_from_cfg
+kind: dataset
+name: LabelledDataset
+params:
+  inputs: [1, 2]
+  targets: [3, 4]
