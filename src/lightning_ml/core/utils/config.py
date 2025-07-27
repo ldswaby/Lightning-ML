@@ -3,7 +3,6 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict
 
 from lightning_ml.core.utils.enums import Registries
-from lightning_ml.core.utils.registry import build, get_constructor
 
 
 @dataclass
@@ -35,6 +34,8 @@ class RegistryConfig:
         Returns:
             An instance of the component.
         """
+        from lightning_ml.core.utils.registry import build
+
         return build(kind, self.name, **self.params)
 
     def get_constructor(self, kind: Registries) -> Callable[..., Any]:
@@ -46,6 +47,8 @@ class RegistryConfig:
         Returns:
             A class or function constructor for the component.
         """
+        from lightning_ml.core.utils.registry import get_constructor
+
         return get_constructor(kind, name=self.name)
 
 
@@ -56,13 +59,12 @@ class DataConfig:
     loader: RegistryConfig
     dataset: RegistryConfig
 
-    def instantiate(self) -> Dict[str, Any]:
-        # 1) build the loader instance
+    def instantiate(self) -> Any:
+        """Instantiate the dataset described by this config."""
+
         loader_obj = self.loader.instantiate(Registries.LOADER)
-        # 2) get the raw Dataset constructor
         ds_cls = self.dataset.get_constructor(Registries.DATASET)
-        # 3) let loader turn that into a dataset
-        return loader_obj.as_dataset(ds_cls, self.dataset.params)
+        return loader_obj.as_dataset(dataset_cls=ds_cls, **self.dataset.params)
 
 
 @dataclass
@@ -74,10 +76,9 @@ class Config:
     seed: int = 42
 
     def instantiate(self) -> Dict[str, Any]:
-        # return {key: getattr(self, key).instantiate(key) for key in Registries}
-        return {
-            key: getattr(self, key).instantiate(key) for key in ["loader", "dataset"]
-        }
+        """Instantiate configured components."""
+
+        return {"data": self.data.instantiate()}
 
 
 # conf/config.py

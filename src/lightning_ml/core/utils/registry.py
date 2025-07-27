@@ -303,7 +303,19 @@ def build(kind: Any, name: str, *args, **kwargs):
 #         >>> obj.shape
 #         (3, 2)
 #     """
-#     config = config.to_dict()
-#     name = config.get("name")
-#     params = config.get("params", {})
-#     return build(kind, name, **params)
+
+
+def build_from_cfg(kind: Any, name: str, params: dict | None = None) -> Any:
+    """Instantiate a registered object from a configuration mapping."""
+
+    return build(kind, name, **(params or {}))
+
+
+def instantiate_from_yaml(cfg_path: str | Path) -> Any:
+    """Load a Hydra YAML config and instantiate the described object."""
+
+    from hydra.utils import instantiate
+    from omegaconf import OmegaConf
+
+    cfg = OmegaConf.load(str(cfg_path))
+    return instantiate(cfg)

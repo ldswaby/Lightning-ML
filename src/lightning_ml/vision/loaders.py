@@ -11,12 +11,15 @@ from typing import Any, Optional, Sequence
 from lightning_ml.core.abstract.loader import BaseLoader
 from lightning_ml.core.data.loaders.folder import Folder
 from lightning_ml.core.utils.loading import IMG_EXTENSIONS, load_image
+from lightning_ml.core.utils.enums import Registries
+from lightning_ml.core.utils.registry import register
 
 # def subdirs_as_classes(directory: str | Path) -> list[str]:
 #     """Finds the class folders in a dataset. Assumes first=layer subdirs."""
 #     return sorted(entry.name for entry in os.scandir(directory) if entry.is_dir())
 
 
+@register(Registries.LOADER)
 class ImageFiles(BaseLoader):
     """Loads images from filepaths"""
 
@@ -32,6 +35,7 @@ class ImageFiles(BaseLoader):
         return [load_image(f) for f in self.file_paths]
 
 
+@register(Registries.LOADER)
 class ImageFolder(Folder):
     """Loads all images from specified folder"""
 

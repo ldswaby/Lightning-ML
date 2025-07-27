@@ -1,0 +1,4 @@
+name: LabelledDataset
+params:
+  inputs: [1, 2]
+  targets: [3, 4]

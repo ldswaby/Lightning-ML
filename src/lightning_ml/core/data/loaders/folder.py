@@ -5,8 +5,11 @@ from typing import Any, Optional
 
 from lightning_ml.core.abstract.loader import BaseLoader
 from lightning_ml.core.utils.loading import has_file_allowed_extension
+from lightning_ml.core.utils.enums import Registries
+from lightning_ml.core.utils.registry import register
 
 
+@register(Registries.LOADER)
 class Folder(BaseLoader):
     """
     Folder data loader.

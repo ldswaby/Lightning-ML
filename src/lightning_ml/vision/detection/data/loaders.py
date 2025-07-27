@@ -12,6 +12,8 @@ from lightning_ml.core.utils.loading import (
 )
 
 from ..loaders import ImageFolder  # ← your current class
+from lightning_ml.core.utils.enums import Registries
+from lightning_ml.core.utils.registry import register
 
 
 # ─────────────────────────────────────────────────────────────
@@ -45,6 +47,7 @@ def _parse_yolo_label_file(path: Path) -> list[dict[str, float]]:
 # ─────────────────────────────────────────────────────────────
 # Loader
 # ─────────────────────────────────────────────────────────────
+@register(Registries.LOADER)
 class YOLOFolder(ImageFolder):
     """YOLO directory-tree loader.
 

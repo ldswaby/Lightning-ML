@@ -8,8 +8,11 @@ from collections.abc import Callable
 from pathlib import Path
 
 from ...loaders import ImageFolder
+from lightning_ml.core.utils.enums import Registries
+from lightning_ml.core.utils.registry import register
 
 
+@register(Registries.LOADER)
 class ImageClassificationFolder(ImageFolder):
     """Loads all images from specified folder"""
 
