@@ -3,8 +3,11 @@ from typing import Any, Dict, Optional, Sequence
 
 from lightning_ml.core.abstract.loader import BaseLoader
 from lightning_ml.core.utils.imports import requires
+from lightning_ml.core.utils.enums import Registries
+from lightning_ml.core.utils.registry import register
 
 
+@register(Registries.LOADER)
 @requires("pandas")
 @dataclass
 class CSVLoader(BaseLoader):
