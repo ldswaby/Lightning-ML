@@ -1,0 +1,9 @@
+# Root config ties everything together and sets defaults
+defaults:
+  - dataset: labelled
+  - loader: imagefolder
+  # - model: resnet50
+  # - optimizer: adam
+
+# Global defaults
+seed: 42

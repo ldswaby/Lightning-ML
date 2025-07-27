@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Callable, TypeVar
+
+from lightning_ml.core.utils.config import RegistryConfig
 
 from .enums import Registries
 from .imports import import_from_str
-from pathlib import Path
-from typing import Any
 
 __all__ = [
     "Registry",
@@ -180,6 +181,43 @@ def register(enum_val: Any, name: str | None = None) -> Callable[[T], T]:
     return decorator
 
 
+def get_constructor(kind: Any, name: str):
+    """Instantiate a registered object (or dotted import) by name.
+
+    Args:
+        kind (Any): Registry bucket (string or enum) to search.
+        name (str): Name of the registered component or a fully‑qualified
+            import path (e.g. ``"package.module.Class"``).
+        *args: Positional arguments forwarded to the target constructor.
+        **kwargs: Keyword arguments forwarded to the target constructor.
+
+    Returns:
+        Any: The instantiated object.
+
+    Raises:
+        KeyError: If ``name`` is not found in the registry and is not a valid
+            import path.
+
+    Example:
+        >>> from lightning_ml.core.utils.registry import build, register
+        >>> @register("model")
+        ... class Linear:
+        ...     def __init__(self, in_features: int, out_features: int):  # doctest: +SKIP
+        ...         self.shape = (in_features, out_features)              # doctest: +SKIP
+        >>> obj = build("model", "Linear", 3, 2)
+        >>> obj.shape
+        (3, 2)
+    """
+    if not any(r.value == kind for r in Registries):
+        raise KeyError(f"Unrecognized kind: {kind}")
+    key = _to_key(kind)
+    if "." in name:
+        cls_or_fn = import_from_str(name)
+    else:
+        cls_or_fn = REGISTRIES[key][name]
+    return cls_or_fn
+
+
 def build(kind: Any, name: str, *args, **kwargs):
     """Instantiate a registered object (or dotted import) by name.
 
@@ -209,13 +247,7 @@ def build(kind: Any, name: str, *args, **kwargs):
     """
     if name is None:
         raise KeyError("cfg must have a `name` key")
-    if not any(r.value == kind for r in Registries):
-        raise KeyError(f"Unrecognized kind: {kind}")
-    key = _to_key(kind)
-    if "." in name:
-        cls_or_fn = import_from_str(name)
-    else:
-        cls_or_fn = REGISTRIES[key][name]
+    cls_or_fn = get_constructor(kind, name)
     return cls_or_fn(*args, **kwargs)
 
 
@@ -247,32 +279,31 @@ def build(kind: Any, name: str, *args, **kwargs):
 #     return build(kind, name, *args, **params)
 
 
-def build_from_cfg(config):
-    """Instantiate a registered object using a configuration mapping.
+# def build_from_cfg(kind: str, config: RegistryConfig):
+#     """Instantiate a registered object using a configuration mapping.
 
-    This convenience wrapper expects ``params`` to be provided in ``**kwargs``.
-    If present, the mapping stored under ``params`` is unpacked and forwarded
-    as keyword arguments to :func:`build`.
+#     This convenience wrapper expects ``params`` to be provided in ``**kwargs``.
+#     If present, the mapping stored under ``params`` is unpacked and forwarded
+#     as keyword arguments to :func:`build`.
 
-    Args:
-        kind (Any): Registry bucket (string or enum) to search.
-        name (str): Name of the registered component or a fully‑qualified
-            import path.
-        *args: Positional arguments forwarded to the target constructor.
-        **kwargs: Should include an optional ``params`` mapping containing
-            keyword arguments for the constructor. Any other keys are ignored.
+#     Args:
+#         kind (Any): Registry bucket (string or enum) to search.
+#         name (str): Name of the registered component or a fully‑qualified
+#             import path.
+#         *args: Positional arguments forwarded to the target constructor.
+#         **kwargs: Should include an optional ``params`` mapping containing
+#             keyword arguments for the constructor. Any other keys are ignored.
 
-    Returns:
-        Any: The instantiated object.
+#     Returns:
+#         Any: The instantiated object.
 
-    Example:
-        >>> cfg = {"params": {"in_features": 3, "out_features": 2}}
-        >>> obj = build_from_cfg("model", "Linear", **cfg)
-        >>> obj.shape
-        (3, 2)
-    """
-    config = config.to_dict()
-    kind = config.get("kind")
-    name = config.get("name")
-    params = config.get("params", {})
-    return build(kind, name, **params)
+#     Example:
+#         >>> cfg = {"params": {"in_features": 3, "out_features": 2}}
+#         >>> obj = build_from_cfg("model", "Linear", **cfg)
+#         >>> obj.shape
+#         (3, 2)
+#     """
+#     config = config.to_dict()
+#     name = config.get("name")
+#     params = config.get("params", {})
+#     return build(kind, name, **params)
