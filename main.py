@@ -1,5 +1,6 @@
 import hydra
 from hydra.core.config_store import ConfigStore
+from omegaconf import OmegaConf
 
 from lightning_ml.core.utils.config import Config
 
@@ -9,6 +10,7 @@ cs.store(name="config", node=Config)
 
 @hydra.main(config_path="conf", config_name="config", version_base=None)
 def main(cfg: Config) -> None:
+    cfg = OmegaConf.to_object(cfg)
     components = cfg.instantiate()
     dataset = components["data"]
     print(f"Loaded dataset: {type(dataset).__name__}, length={len(dataset)}")
